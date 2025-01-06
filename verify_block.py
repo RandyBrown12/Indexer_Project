@@ -99,4 +99,3 @@ try:
 except errors.UniqueViolation as e:
     pass
 cursor.close()
- #//#/home/tw2623/Indexer-Project/test_blocks/srv/2024/06/01
