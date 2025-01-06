@@ -91,23 +91,3 @@ for table in type_with_signer:
         connection.rollback()  
     finally:
         connection.autocommit = True
-    
-    
-    
-#for type in type_with_signer:   
-    # query = f'SELECT signer FROM {type}'
-    # try:
-    
-    #     cursor.execute(query)
-    #     result = cursor.fetchall()
-
-    #     for address in result:
-        
-    #         address_load.main(address[0])
-        
-    # except errors.UndefinedColumn as e: 
-    #     pass
-    # except errors.UniqueViolation as e:
-    #     pass
-
-    
