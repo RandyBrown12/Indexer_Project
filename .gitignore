@@ -3,3 +3,9 @@ test_blocks4/
 
 # Ignore info.json
 info.json
+
+# Ignore log files
+log/
+
+# Ignore pycache
+__pycache__/
