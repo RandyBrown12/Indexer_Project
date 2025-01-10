@@ -37,11 +37,11 @@ import importlib
 import address_load
 import os
 
-from functions import check_file
-from functions import create_connection
-from functions import decode_tx
-from functions import hash_to_hex
-from functions import new_type
+from utilities import check_file
+from utilities import create_connection
+from utilities import decode_tx
+from utilities import hash_to_hex
+from utilities import new_type
 from pathlib import Path
 from psycopg2 import errors
 import traceback

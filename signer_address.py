@@ -2,7 +2,7 @@
 
 import json
 import address_load
-from functions import create_connection
+from utilities import create_connection
 from psycopg2 import errors
 
 db_name = "zyangdb"

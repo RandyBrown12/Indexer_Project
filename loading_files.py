@@ -25,9 +25,9 @@ New package: psycopg2 now applies on this script                                
 #    Scripts start below
 import os
 import json
-from functions import check_file
-from functions import create_connection
-from functions import block_hash_base64_to_hex
+from utilities import check_file
+from utilities import create_connection
+from utilities import block_hash_base64_to_hex
 from psycopg2 import errors
 
 
