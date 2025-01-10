@@ -32,7 +32,7 @@ pip install -r requirements.txt
 ## Usage
 To run the whole project, run the command git clone
 ```
-git clone https://github.com/ziqiyang6/Indexer_Project_2
+git clone https://github.com/RandyBrown12/Indexer_Project
 ```
 **Please open 'info.json.template', copy this file to a new file called 'info.json', and input the postgreSQL login information. Do not input any personal information into info.json.template.**
 
