@@ -113,7 +113,7 @@ def height_check(content,file_name):
     return height
 
 
-def Validate_json(content, file_name):
+def validate_json(content, file_name):
     try:
         with open('resources/JSON_block_schema.json', 'r') as json_file:
             json_schema = json.load(json_file)

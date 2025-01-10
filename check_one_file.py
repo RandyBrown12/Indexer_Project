@@ -26,7 +26,7 @@ import sys
 import json
 from lib.utilities import check_file
 from lib.utilities import height_check
-from lib.utilities import Validate_json, checkLine
+from lib.utilities import validate_json, checkLine
 from lib.utilities import new_type
 from lib.utilities import decode_tx
 
@@ -39,7 +39,7 @@ result = check_file(file_path, file_name)
 height = height_check(result, file_name)
 
 # Check if this file passes JSON Schema test. 1 is the specific case that passes.
-if Validate_json(result, file_name) == 1:
+if validate_json(result, file_name) == 1:
 
     # Count numbers of transactions in this block
     count = len(result["block"]["data"]["txs"])
