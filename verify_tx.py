@@ -23,7 +23,7 @@ from functions import create_connection
 from functions import block_hash_base64_to_hex
 from functions import hash_to_hex, decode_tx, time_parse
 from psycopg2 import errors#  compare_nested_json,
-from datetime import datetime, timedelta, timezone
+from datetime import timezone
 
 with open("info.json", "r") as f:
     info = json.load(f)
@@ -86,7 +86,7 @@ trans_values = {
     'tx_info': json.dumps(decoded_response),
     'comment': f'This is number {order} transaction in BLOCK {height}'
 }
-print(decoded_response)
+#print(decoded_response)
 try:
     query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s AND tx_hash = %s"
     cursor.execute(query, (height, tx_hash))

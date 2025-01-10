@@ -6,7 +6,7 @@ from functions import check_file
 from functions import create_connection
 from functions import block_hash_base64_to_hex, time_parse
 from psycopg2 import errors
-from datetime import datetime, timedelta, timezone
+from datetime import timezone
 
 
 
