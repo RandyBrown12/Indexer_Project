@@ -17,7 +17,7 @@ Version: 1.0                                                                    
 **********************************************************************************'''
 
 #    Scripts start below
-from utilities import create_connection
+from lib.utilities import create_connection
 import json
 from psycopg2 import errors
 import sys

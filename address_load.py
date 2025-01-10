@@ -20,7 +20,7 @@ changed to only three condition, 'user', 'validator', and 'contract'.           
 **********************************************************************************'''
 
 #    Scripts start below
-from utilities import create_connection
+from lib.utilities import create_connection
 from datetime import datetime
 import json
 import os

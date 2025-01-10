@@ -10,6 +10,10 @@ log/
 # Ignore pycaches
 __pycache__/
 types_script/__pycache__/
+lib/__pycache__/
 
 # Ignore nohup.out
 nohup.out
+
+# Ignore .vscode
+.vscode/

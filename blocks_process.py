@@ -19,8 +19,8 @@ Version: 1.0                                                                    
 #    Scripts start below
 import os
 import json
-from utilities import check_file
-from utilities import create_connection
+from lib.utilities import check_file
+from lib.utilities import create_connection
 from psycopg2 import errors
 from datetime import datetime
 

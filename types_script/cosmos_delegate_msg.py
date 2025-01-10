@@ -26,7 +26,7 @@ KeyError output now can be printed into error log instead of output log         
 **********************************************************************************'''
 
 #    Scripts start below
-from utilities import create_connection
+from lib.utilities import create_connection
 import json
 import sys
 import os

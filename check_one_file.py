@@ -24,11 +24,11 @@ Version: 1.0                                                                    
 import os
 import sys
 import json
-from utilities import check_file
-from utilities import height_check
-from utilities import Validate_json, checkLine
-from utilities import new_type
-from utilities import decode_tx
+from lib.utilities import check_file
+from lib.utilities import height_check
+from lib.utilities import Validate_json, checkLine
+from lib.utilities import new_type
+from lib.utilities import decode_tx
 
 
 
