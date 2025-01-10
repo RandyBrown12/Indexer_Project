@@ -124,7 +124,7 @@ connection.commit()
 # ----------------------------------------------------------- Line for message loading ---------------------
 
 # Read the type.json file
-with open('type.json', 'r') as f:
+with open('resources/type.json', 'r') as f:
     type_json = json.load(f)
 
 

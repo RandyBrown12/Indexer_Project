@@ -19,7 +19,7 @@ cursor = connection.cursor()
 
 type_with_signer = []
 
-with open('type.json', 'r') as f:
+with open('resources/type.json', 'r') as f:
     type_json = json.load(f)
 
 for item in type_json.items():
