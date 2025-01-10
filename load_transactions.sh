@@ -20,22 +20,22 @@
 #                   exit 8 ---- The transaction was not loaded into the database. 	#
 #                   exit 9 --- Error in executing Txs.sql                    		#
 #                                                                               	#
-# DEVELOPER: Olaf Yang and Shikhar Gupta                                      		#
-# DEVELOPER PHONE: +1 (516) 503-6032                                            	#
-# DEVELOPER EMAIL: ziqiyang91@gmail.com, shikhar.gupta.tx@gmail.com                 #
+# DEVELOPER: Randy Brown                                      		                #
+# DEVELOPER PHONE: +1 (405) 318-5961                                            	#
+# DEVELOPER EMAIL: randybrown9812@gmail.com                                         #
 #                                                                               	#
 # VERSION: 1.0                                                                  	#
 #											                                        #
 # VERSION: 1.1										                                #
 # The path has been updated to info.json file, which means the path			        #
 # can be changed manually								                            #
-# Loading files are applied in this version						#
-#											#
-# VERSION: 1.2										#
-# Filename update and arguments added.							#
-# Verification of blocks check added.							#
+# Loading files are applied in this version						                    #
+#											                                        #
+# VERSION: 1.2										                                #
+# Filename update and arguments added.							                    #
+# Verification of blocks check added.							                    #
 #                                                                            		#
-# VERSION: 1.3										#
+# VERSION: 1.3										                                #
 # Removed dependency on explicit filepaths within info.json.                    	#
 #                                                                               	#
 #***************************************************************************************#
