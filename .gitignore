@@ -7,8 +7,9 @@ info.json
 # Ignore log files
 log/
 
-# Ignore pycache
+# Ignore pycaches
 __pycache__/
+types_script/__pycache__/
 
 # Ignore nohup.out
 nohup.out
