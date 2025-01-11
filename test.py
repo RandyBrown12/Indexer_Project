@@ -1,7 +1,6 @@
 
 import requests
 import json
-import sys
 
 def decode_tx(tx):
         url_array = ["https://lcd-terra.wildsage.io", "https://phoenix-lcd.terra.dev:443", "https://api-terra.cosmos-spaces.cloud", "https://api-terra-01.stakeflow.io", "https://terra-phoenix-api.highstakes.ch", "https://terra-api.polkachu.com"]

@@ -41,7 +41,6 @@ from lib.utilities import check_file
 from lib.utilities import create_connection
 from lib.utilities import decode_tx
 from lib.utilities import hash_to_hex
-from lib.utilities import new_type
 from pathlib import Path
 from psycopg2 import errors
 import traceback
