@@ -85,7 +85,6 @@ try:
     memo = decoded_response['tx']['body']['memo']
 
     if len(decoded_response['tx']['auth_info']['fee']['amount']) != 0:
-        print("run")
         fee_denom = decoded_response['tx']['auth_info']['fee']['amount'][0]['denom']
         fee_amount = decoded_response['tx']['auth_info']['fee']['amount'][0]['amount']
     else:
@@ -137,7 +136,7 @@ for message in decoded_response['tx']['body']['messages']:
 
     try:
         table_type = type_json[type]
-        print(table_type)
+        print(f"Transaction Table: {table_type}")
     except KeyError:
         
         print(f"Error with loading block info in block " + file_name, file=sys.stderr)

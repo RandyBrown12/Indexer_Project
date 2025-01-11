@@ -46,6 +46,7 @@ values = (block_hash_hex,)
 try:
     cursor.execute(query, values)
     result = cursor.fetchall()
+    print("Block has been verified!")
     cursor.close()
     # check there should only be one row
     if result is None or len(result) != 1:
