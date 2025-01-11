@@ -164,7 +164,7 @@ for message in decoded_response['tx']['body']['messages']:
 
     try:
         # Go to the diectory that contains the scripts
-        module_path = Path(f"{cwd}/types_script")
+        module_path = Path(f"{cwd}/lib/blockchain_msgs_scripts")
         expanded_script_path = os.path.expanduser(module_path)
         sys.path.append(expanded_script_path)
 
