@@ -76,7 +76,7 @@ block_count=0
 txn_count=0
 
 
-while getopts ":i:b:o:thv" opt; do
+while getopts ":b:o:thv" opt; do
           case $opt in
                   h) usage
                          ;;
@@ -209,13 +209,6 @@ if [[ $verbose == true ]]; then
     echo "Txs.sql has been executed."
 fi
 
-# Select the files in the folder path and run python script 4
-num_blocks=$(ls $folder_path | wc -l)
-bar_size=40
-bar_char_done="#"
-bar_char_todo="-"
-bar_percentage_scale=2
-
 for file_name in $files; do
     # if folder_path does not end with /, add / to the end
     if [[ $folder_path != */ ]]; then
@@ -246,6 +239,7 @@ for file_name in $files; do
             echo -e "$FILE_NAME passes the verification test."
         fi
         block_count=$((block_count+1))
+    # Run regular Python
     else
         python check_one_file.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? == 8 ]]; then
