@@ -23,12 +23,9 @@ Version: 1.0                                                                    
 ####    Scripts start below
 import os
 import sys
-import json
 from lib.utilities import check_file
 from lib.utilities import height_check
 from lib.utilities import validate_json, checkLine
-from lib.utilities import new_type
-from lib.utilities import decode_tx
 
 
 
@@ -44,7 +41,7 @@ if validate_json(result, file_name) == 1:
     # Count numbers of transactions in this block
     count = len(result["block"]["data"]["txs"])
 
-    # If there is no transaction in this block, end this progress
+    # Display transaction
     if count == 0:
         sys.exit(10)
     else:

@@ -25,6 +25,7 @@ New package: psycopg2 now applies on this script                                
 #    Scripts start below
 import os
 import json
+import sys
 from lib.utilities import check_file
 from lib.utilities import create_connection
 from lib.utilities import block_hash_base64_to_hex
@@ -58,7 +59,8 @@ try:
     created_time = content['block']['header']['time']
 except Exception as e:
     print(f"Error with loading block info in block " + file_name, file=sys.stderr)
-    raise
+    sys.exit(6)
+
 # Edit the query that will be loaded to the database
 query = """
 INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s, %s, %s, %s, %s);
@@ -67,9 +69,13 @@ INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s
 values = (block_hash_hex, chain_id, height, tx_num, created_time)
 
 cursor = connection.cursor()
+
 try:
     cursor.execute(query, values)
 except errors.UniqueViolation as e:
-    pass
+    print(f"Unique value has occured: {e}")
+    sys.exit(6)
 connection.commit()
+
+print("File has been loaded!")
 cursor.close()
