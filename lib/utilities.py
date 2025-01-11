@@ -192,7 +192,7 @@ def decode_tx(tx, max_retries=10, retry_delay=2):
     return None
 
 
-def create_connection(db_name, db_user, db_password, db_host, db_port):
+def create_connection(db_name, db_user, db_password, db_host, db_port) -> psycopg2.connection:
     connection = None
     try:
         connection = psycopg2.connect(
