@@ -18,7 +18,7 @@ Version: 1.0                                                                    
 **********************************************************************************'''
 
 #    Scripts start below
-from lib.utilities import create_connection
+from utilities import create_connection
 import json
 from psycopg2 import errors
 import sys
@@ -27,7 +27,7 @@ import traceback
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 sys.path.append(parent_dir)
-import address_load
+import lib.address_load as address_load
 file_name = os.getenv('FILE_NAME')
 
 def main(tx_id, message_no, transaction_no, tx_type, message):

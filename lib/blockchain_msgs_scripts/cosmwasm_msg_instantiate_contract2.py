@@ -1,5 +1,5 @@
 #    Scripts start below
-from lib.utilities import create_connection
+from utilities import create_connection
 import json
 import sys
 import os
