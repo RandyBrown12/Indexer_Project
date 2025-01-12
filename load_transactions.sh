@@ -199,7 +199,7 @@ DBPORT=$(jq -r '.psql.db_port' $info_path)
 
 # Connect to psql
 
-PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h localhost -f "$(pwd)"/resources/sql/Txs.sql --quiet --set ON_ERROR_STOP=1
+PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h $DBHOST -p $DBPORT -f "$(pwd)"/resources/sql/Txs.sql --quiet --set ON_ERROR_STOP=1
 
 if [[ $? -ne 0 ]]; then
     die "Error---->Txs.sql had an error. (Exit code $?). Check log file for more information" 9
