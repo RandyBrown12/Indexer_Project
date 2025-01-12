@@ -23,11 +23,7 @@ Version: 1.0                                                                    
 ####    Scripts start below
 import os
 import sys
-from lib.utilities import check_file
-from lib.utilities import height_check
-from lib.utilities import validate_json, checkLine
-
-
+from utilities import check_file, height_check, validate_json, checkLine
 
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')

@@ -218,21 +218,21 @@ for file_name in $files; do
     export FILE_NAME="${file_name}"
     # if python_three is true, run python3
     if [[ $python_three == true ]]; then
-        python3 check_one_file.py >> $BLOCKS_LOG 2>> $ERR
+        python3 $(pwd)/lib/check_one_file.py >> $BLOCKS_LOG 2>> $ERR
         # Error code 8 means the block does not pass the validation
         if [[ $? == 8 ]]; then
             die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
         fi
-        python3 loading_files.py >> $BLOCKS_LOG 2>> $ERR
+        python3 $(pwd)/lib/loading_files.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
             echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
-        python3 verify_block.py >> $BLOCKS_LOG 2>> $ERR
+        python3 $(pwd)/lib/verify_block.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
             echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
         elif [[ $verbose == true ]]; then
@@ -241,13 +241,13 @@ for file_name in $files; do
         block_count=$((block_count+1))
     # Run regular Python
     else
-        python check_one_file.py >> $BLOCKS_LOG 2>> $ERR
+        python $(pwd)/lib/check_one_file.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? == 8 ]]; then
             die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
         fi
-        python loading_files.py >> $BLOCKS_LOG 2>> $ERR
+        python $(pwd)/lib/loading_files.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
             
 	    echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
@@ -255,7 +255,7 @@ for file_name in $files; do
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
-        python verify_block.py >> $BLOCKS_LOG 2>> $ERR
+        python $(pwd)/lib/verify_block.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
             die "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
         elif [[ $verbose == true ]]; then
@@ -277,14 +277,14 @@ for file_name in $files; do
         for ((i = 0; i < $length; i++)); do
             export x=$i
             if [[ $python_three == true ]]; then
-                python3 loading_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
-                python3 verify_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
+                python3 $(pwd)/lib/loading_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
+                python3 $(pwd)/lib/verify_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
                 if [[ $? -ne 0 ]]; then
                     echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
                 fi
             else
-                python loading_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
-                python verify_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
+                python $(pwd)/lib/loading_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
+                python $(pwd)/lib/verify_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
                 if [[ $? -ne 0 ]]; then
                     echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
                 fi

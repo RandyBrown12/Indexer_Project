@@ -2,9 +2,7 @@
 import os
 import sys
 import json
-from lib.utilities import check_file
-from lib.utilities import create_connection
-from lib.utilities import block_hash_base64_to_hex, time_parse
+from utilities import check_file, create_connection, block_hash_base64_to_hex, time_parse
 from psycopg2 import errors
 from datetime import timezone
 

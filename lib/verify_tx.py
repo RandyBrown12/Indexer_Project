@@ -18,10 +18,7 @@ Version: 1.0                                                                    
 import os
 import sys
 import json
-from lib.utilities import check_file
-from lib.utilities import create_connection
-from lib.utilities import block_hash_base64_to_hex
-from lib.utilities import hash_to_hex, decode_tx, time_parse
+from utilities import check_file, create_connection, block_hash_base64_to_hex, hash_to_hex, decode_tx, time_parse
 from psycopg2 import errors#  compare_nested_json,
 from datetime import timezone
 

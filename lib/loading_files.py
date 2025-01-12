@@ -26,12 +26,8 @@ New package: psycopg2 now applies on this script                                
 import os
 import json
 import sys
-from lib.utilities import check_file
-from lib.utilities import create_connection
-from lib.utilities import block_hash_base64_to_hex
+from utilities import check_file, create_connection, block_hash_base64_to_hex
 from psycopg2 import errors
-
-
 
 with open('info.json', 'r') as f:
     info = json.load(f)

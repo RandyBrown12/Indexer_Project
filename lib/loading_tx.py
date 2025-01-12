@@ -34,13 +34,10 @@ KeyError output now can be printed into error log instead of output log         
 import sys
 import json
 import importlib
-import address_load
+import address_load as address_load
 import os
 
-from lib.utilities import check_file
-from lib.utilities import create_connection
-from lib.utilities import decode_tx
-from lib.utilities import hash_to_hex
+from utilities import check_file, create_connection, decode_tx, hash_to_hex
 from pathlib import Path
 from psycopg2 import errors
 import traceback
