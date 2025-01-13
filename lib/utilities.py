@@ -165,7 +165,7 @@ def decode_tx(tx, max_retries=10, retry_delay=2):
     Returns:
         Decoded transaction if successful, None otherwise.
     """
-    url_array = ["https://terra-rest.publicnode.com/", "https://api-terra-01.stakeflow.io", "https://terra-api.polkachu.com"]
+    url_array = ["https://terra-rest.publicnode.com/", "https://api-terra-01.stakeflow.io/", "https://terra-api.polkachu.com/"]
     headers = {'Content-Type': 'application/json'}
     data = json.dumps({"tx_bytes": tx})
     retries = 0
