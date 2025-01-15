@@ -63,7 +63,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         else:
             instantiate_permission = message['instantiate_permission']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         values = (tx_id, tx_type, ids['sender_id'], wasm_byte_code, instantiate_permission, message, comment)
         cursor.execute(query, values)

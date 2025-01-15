@@ -59,7 +59,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         # Define the values
         contract = message['contract']
         message_info = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         # Condition 1: If key 'funds' contains any info, load like this
         if len(message['funds']) > 0 :

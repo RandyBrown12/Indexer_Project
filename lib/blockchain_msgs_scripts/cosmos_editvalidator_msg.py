@@ -64,7 +64,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         description_security_contact = message['description']['security_contact']
         description_details = message['description']['details']
         commission_rate = message['commission_rate']
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         # If self delegation is NULL, make it as ''
         if message['min_self_delegation'] == None:

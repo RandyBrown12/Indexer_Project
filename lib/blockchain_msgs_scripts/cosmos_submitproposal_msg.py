@@ -48,7 +48,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         title = content['title']
         descriptions = content['description']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         #  Edit the query that will be loaded to the database
         query = """

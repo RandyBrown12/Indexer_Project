@@ -32,7 +32,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
                 """
         contract = message['contract']
         message_info = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         code_id = message['code_id']
         msg = list(message['msg']['with_update'])

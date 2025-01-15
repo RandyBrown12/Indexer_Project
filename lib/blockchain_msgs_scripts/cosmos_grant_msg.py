@@ -63,7 +63,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         # Define the values
         authorizationtype = message['grant']['authorization']['@type']
         expiration = message['grant']['expiration']
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         # Condition 1: if there is more than two element in authorization, load like this
         if len(message['grant']['authorization']) > 2 :

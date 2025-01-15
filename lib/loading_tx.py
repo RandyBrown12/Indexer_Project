@@ -90,7 +90,7 @@ try:
     gas_limit = decoded_response['tx']['auth_info']['fee']['gas_limit']
     created_time = content['block']['header']['time']
     order = int(num) + 1
-    comment = f'This is number {order} transaction in BLOCK {height}'
+    comment = ''
     tx_info = json.dumps(decoded_response)
 except Exception as e:
     

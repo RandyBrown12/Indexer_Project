@@ -49,7 +49,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
         # Define the values
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         values = (tx_id, tx_type, ids['signer_id'], message, comment)
         cursor.execute(query, values)

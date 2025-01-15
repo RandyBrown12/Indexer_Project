@@ -75,7 +75,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         proof_height_revision_height = message['proof_height']['revision_height']
         signer = message['signer']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         values = (tx_id, tx_type, client_id, previous_connection_id, counterparty_client_id, counterparty_connection_id, counterparty_versions_identifier, counterparty_versions_features, proof_init, proof_height_revision_number, proof_height_revision_height, ids['signer_id'], message,comment)
         cursor.execute(query, values)

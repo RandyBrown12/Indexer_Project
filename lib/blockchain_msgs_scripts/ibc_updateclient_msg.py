@@ -58,7 +58,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         client_message = json.dumps(message['client_message'])
         signer = message['signer']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
 
         query = """

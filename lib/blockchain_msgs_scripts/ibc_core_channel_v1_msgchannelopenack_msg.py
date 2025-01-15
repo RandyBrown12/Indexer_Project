@@ -51,7 +51,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         counterparty_channel_id = message['counterparty_channel_id']
         signer = message['signer']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         values = (tx_id, tx_type, port_id, channel_id, counterparty_channel_id, ids['signer_id'], message,comment)
         cursor.execute(query, values)

@@ -40,7 +40,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         msg = list(message['msg'])
         funds = message['funds']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
 
         values = (tx_id, tx_type, sender, admin, code_id, label, msg,funds, message,comment)

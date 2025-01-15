@@ -66,7 +66,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         timeout_timestamp = message['timeout_timestamp']
         memo = message['memo']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         values = (tx_id, tx_type, ids['sender_id'], ids['receiver_id'], source_port, source_channel, token_denom, token_amount, timeout_height_revision_num, timeout_height_revision_height, timeout_timestamp, memo, message, comment)
         cursor.execute(query, values)

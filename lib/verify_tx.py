@@ -80,7 +80,7 @@ trans_values = {
     'gas_limit': decoded_response['tx']['auth_info']['fee']['gas_limit'],
     'created_at': content['block']['header']['time'],
     'tx_info': json.dumps(decoded_response),
-    'comment': f'This is number {order} transaction in BLOCK {height}'
+    'comment': ''
 }
 #print(decoded_response)
 try:

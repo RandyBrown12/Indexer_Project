@@ -44,7 +44,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         proposal_id = message['proposal_id']
         option = message['option']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
 
         # Edit the query that will be loaded to the database

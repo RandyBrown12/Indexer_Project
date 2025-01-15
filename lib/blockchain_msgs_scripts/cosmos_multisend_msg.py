@@ -59,7 +59,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
         inputs_denom = message['inputs'][0]['coins'][0]['denom']
         inputs_amount = message['inputs'][0]['coins'][0]['amount']
         messages = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
 
         # Edit the query that will be loaded to the database

@@ -53,7 +53,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         tx_denom = message['amount']['denom']
         amount = message['amount']['amount']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         query = """
         INSERT INTO alliance_redelegate_msg (tx_id, tx_type, delegator_address_id, validator_src_address_id, validator_dst_address_id, tx_denom, amount, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s,%s,%s);

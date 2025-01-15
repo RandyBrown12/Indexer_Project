@@ -68,7 +68,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         frozen_height_revision_height = message['client_state']['frozen_height']['revision_height']
         signer = message['signer']
         message = json.dumps(message)
-        comment = f'This is number {message_no} message in number {transaction_no} transaction '
+        comment = ''
 
         values = (tx_id, tx_type, client_type, client_chain_id, client_trust_level_num, client_trust_level_denom, latest_height_revision_num, latest_height_revision_height, frozen_height_revision_number, frozen_height_revision_height, ids['signer_id'], message, comment)
         cursor.execute(query, values)
