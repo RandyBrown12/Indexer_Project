@@ -214,7 +214,7 @@ def hash_to_hex(data: str) -> str:
         # Convert hash to uppercase
         return sha256_hash.upper()
     except Exception as e:
-        print(f"Error while hashing: {e}")
+        print(f"Error while hashing: {e}", file=sys.stderr)
         return None
 
 def block_hash_base64_to_hex(hash: str) -> str:
@@ -226,7 +226,7 @@ def block_hash_base64_to_hex(hash: str) -> str:
         # Convert hash to uppercase
         return hex_str.upper()
     except Exception as e:
-        print(f"Error while hashing: {e}")
+        print(f"Error while hashing: {e}", file=sys.stderr)
         return None
 def checkLine(file_path, file_name, N):
        try:
