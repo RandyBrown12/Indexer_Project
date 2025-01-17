@@ -221,20 +221,22 @@ for file_name in $files; do
         python3 $(pwd)/lib/check_one_file.py >> $BLOCKS_LOG 2>> $ERR
         # Error code 8 means the block does not pass the validation
         if [[ $? == 8 ]]; then
-            die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
+            echo "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information"
+            continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
         fi
         python3 $(pwd)/lib/loading_files.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
-            echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
+            echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
         python3 $(pwd)/lib/verify_block.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
-            echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
+            echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information"
+            continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the verification test."
         fi
@@ -243,21 +245,22 @@ for file_name in $files; do
     else
         python $(pwd)/lib/check_one_file.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? == 8 ]]; then
-            die "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information" 5
+            echo "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information"
+            continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
         fi
         python $(pwd)/lib/loading_files.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
-            
-	    echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 6
+	        echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
         python $(pwd)/lib/verify_block.py >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
-            die "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information" 7
+            echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information"
+            continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the verification test."
         fi
@@ -280,13 +283,15 @@ for file_name in $files; do
                 python3 $(pwd)/lib/loading_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
                 python3 $(pwd)/lib/verify_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
                 if [[ $? -ne 0 ]]; then
-                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
+                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
+                    continue
                 fi
             else
                 python $(pwd)/lib/loading_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
                 python $(pwd)/lib/verify_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
                 if [[ $? -ne 0 ]]; then
-                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information" 8
+                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
+                    continue
                 fi
             fi
             txn_count=$((txn_count+1))
