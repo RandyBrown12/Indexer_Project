@@ -14,7 +14,6 @@ class Validate_Decode_Tx_Function(unittest.TestCase):
         self.assertDictEqual(decode_tx(valid_tx_string), valid_json)
         
     def test_invalid_base64(self):
-        # self.assertEqual(2, 5)
         self.assertEqual(decode_tx("abc"), None)
 
 if __name__ == "__main__":

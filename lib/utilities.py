@@ -153,9 +153,9 @@ def new_type(message, file_path, height, transaction_num, message_num):
             file.write(message + '\n' + '\n')
 
 
-def decode_tx(tx, max_retries=10, retry_delay=2):
+def decode_tx(tx, max_retries=3, retry_delay=5):
     """
-    Decodes a transaction using an external API.
+    Decodes a transaction using external APIs.
 
     Args:
         tx: The transaction to decode.
@@ -168,29 +168,28 @@ def decode_tx(tx, max_retries=10, retry_delay=2):
     url_array = ["https://terra-rest.publicnode.com/", "https://api-terra-01.stakeflow.io/", "https://terra-api.polkachu.com/"]
     headers = {'Content-Type': 'application/json'}
     data = json.dumps({"tx_bytes": tx})
-    retries = 0
 
-    while retries < max_retries:
-        try:
-            full_url = url_array[retries] + "cosmos/tx/v1beta1/decode"
-            response = requests.post(full_url, headers=headers, data=data, timeout=5)  # Adding a 5-second timeout
-            if response.status_code == 200:
-                print(f"Successfully decoded transaction")
-                return response.json()
-            else:
-                print(f"Error: Unable to decode transaction, server returned status code {response.status_code} using {full_url}", file=sys.stderr)
-                if response.status_code in [400, 502, 503, 504]:  # Retry on certain status codes
-                    time.sleep(retry_delay)
-                    retries += 1
+    for url in url_array:
+        current_retries = max_retries
+        while current_retries > 0:
+            try:
+                full_url = url + "cosmos/tx/v1beta1/decode"
+                response = requests.post(full_url, headers=headers, data=data, timeout=5)  # Adding a 5-second timeout
+                if response.status_code == 200:
+                    print(f"Successfully decoded transaction")
+                    return response.json()
                 else:
-                    break  # Do not retry on other errors
-        except requests.exceptions.RequestException as e:
-            print(f"Network request error: {e} using {full_url}", file=sys.stderr)
-            time.sleep(retry_delay)
-            retries += 1
-
+                    print(f"Error: Unable to decode transaction, server returned status code {response.status_code} using {full_url}", file=sys.stderr)
+                    if response.status_code in [502, 503, 504]:  # Retry on certain status codes
+                        time.sleep(retry_delay)
+                        current_retries -= 1
+                    else:
+                        break  # Do not retry on other errors
+            except requests.exceptions.RequestException as e:
+                print(f"Network request error: {e} using {full_url}", file=sys.stderr)
+                time.sleep(retry_delay)
+                current_retries -= 1
     return None
-
 
 def create_connection(db_name, db_user, db_password, db_host, db_port):
     connection = None
