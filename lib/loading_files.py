@@ -43,6 +43,7 @@ connection = create_connection(db_name, db_user, db_password, db_host, db_port)
 
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
+num = os.getenv('x')
 
 # Set the values that will be loaded to database
 try:
@@ -73,5 +74,5 @@ except errors.UniqueViolation as e:
     sys.exit(6)
 connection.commit()
 
-print("File has been loaded!")
+print(f"File: {file_name} has been loaded!")
 cursor.close()

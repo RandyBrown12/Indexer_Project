@@ -21,6 +21,7 @@ connection = create_connection(db_name, db_user, db_password, db_host, db_port)
 
 file_path = os.getenv("FILE_PATH")
 file_name = os.getenv("FILE_NAME")
+num = os.getenv("x")
 
 # json file content
 content = check_file(file_path, file_name)
@@ -44,7 +45,7 @@ values = (block_hash_hex,)
 try:
     cursor.execute(query, values)
     result = cursor.fetchall()
-    print("Block has been verified!")
+    print(f"Block: {file_name} has been verified!")
     cursor.close()
     # check there should only be one row
     if result is None or len(result) != 1:

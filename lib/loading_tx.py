@@ -64,14 +64,16 @@ cwd = os.getcwd()
 
 # Set the values that will be loaded to database
 content = check_file(file_path, file_name)
-num = os.getenv('x')
+num = int(os.getenv('x'))
 # decoded_response = decode_tx(content['block']['data']['txs'][int(num)])
 try:
-    transaction_string = content['block']['data']['txs'][int(num)]
+    transaction_string = content['block']['data']['txs'][num]
     decoded_response = decode_tx(transaction_string)
-    if(decoded_response == None):
+    if(decoded_response is None):
         print(f"failed to decode transaction in block {file_name}", file=sys.stderr)
         exit()
+    else:
+        print(f"Transaction {num + 1} from {file_name} has been successfully decoded!")
     tx_hash = hash_to_hex(transaction_string)
     chain_id = content['block']['header']['chain_id']
     height = content['block']['header']['height']
@@ -89,7 +91,7 @@ try:
         fee_amount = 0
     gas_limit = decoded_response['tx']['auth_info']['fee']['gas_limit']
     created_time = content['block']['header']['time']
-    order = int(num) + 1
+    order = num + 1
     comment = ''
     tx_info = json.dumps(decoded_response)
 except Exception as e:

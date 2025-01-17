@@ -40,7 +40,7 @@ connection = create_connection(db_name, db_user, db_password, db_host, db_port)
 file_path = os.getenv("FILE_PATH")
 file_name = os.getenv("FILE_NAME")
 content = check_file(file_path, file_name)
-num = os.getenv('x')
+num = int(os.getenv('x'))
 
 block_hash = content["block_id"]["hash"]
 block_hash_hex = block_hash_base64_to_hex(block_hash)
@@ -49,11 +49,11 @@ height = content["block"]["header"]["height"]
 tx_num = str(len(content["block"]["data"]["txs"]))
 created_time = content["block"]["header"]["time"]
 
-transaction_string = content['block']['data']['txs'][int(num)]
+transaction_string = content['block']['data']['txs'][num]
 decoded_response = decode_tx(transaction_string)
 #print(decoded_response)
 tx_hash = hash_to_hex(transaction_string)
-order = int(num) + 1
+order = num + 1
 loadedCorrectly = True
 cursor = connection.cursor()
 search_query = f"SELECT block_id FROM blocks WHERE height = '{height}'" # Search the block hash from the block
@@ -132,6 +132,7 @@ try:
                     "Found: " + str(db_info) + "\n", file=sys.stderr
                 )
                cursor.close()
+        print(f"Transaction {num + 1} from {file_name} has been verified!")
 
 except errors.UniqueViolation as e:
     pass

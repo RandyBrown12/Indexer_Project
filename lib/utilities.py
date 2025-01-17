@@ -176,7 +176,6 @@ def decode_tx(tx, max_retries=3, retry_delay=5):
                 full_url = url + "cosmos/tx/v1beta1/decode"
                 response = requests.post(full_url, headers=headers, data=data, timeout=5)  # Adding a 5-second timeout
                 if response.status_code == 200:
-                    print(f"Successfully decoded transaction")
                     return response.json()
                 else:
                     print(f"Error: Unable to decode transaction, server returned status code {response.status_code} using {full_url}", file=sys.stderr)
