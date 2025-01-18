@@ -30,6 +30,11 @@
 --- New types 'ibc_core_channel_v1_msgchannelopenack' and
 --- 'ibc_core_channel_v1_msgchannelopeninit' have been added.             -
 --- Commission_rate is set to accept null values
+---
+--- Version 1.6
+--- New table message_table_lookup has been created to perform a join
+--- between the message tables and the transaction table. An index
+--- has also been created using the tx_id and message_id columns.
 ---------------------------------------------------------------------------
 SET client_min_messages TO WARNING;
 
@@ -1244,3 +1249,14 @@ create index if not exists ibc_connectionopeninit_msg_signer_id
     on ibc_connectionopeninit_msg (signer_id);
 create index if not exists ibc_connectionopeninit_msg_tx_id
     on ibc_connectionopeninit_msg (tx_id);
+
+create table if not exists message_table_lookup(
+    message_table_id UUID default gen_random_uuid() not null primary key,
+    txs_id UUID not null,
+    message_id UUID not null,
+    message_table_name VARCHAR not null,
+    UNIQUE(message_id)     
+);
+
+create index if not exists message_table_lookup_txs_and_msg_id
+    on message_table_lookup (txs_id, message_id);

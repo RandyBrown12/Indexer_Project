@@ -37,8 +37,10 @@
 #                                                                            		#
 # VERSION: 1.3										                                #
 # Removed dependency on explicit filepaths within info.json.                    	#
-#                                                                               	#
-#***************************************************************************************#
+#                                                                                   #
+# VERSION: 1.4                                                                      #
+# Added Txs.sql Version 1.6 to load_transactions.sh.                                        #
+#***********************************************************************************#
 
 
 # Define the shell functions
