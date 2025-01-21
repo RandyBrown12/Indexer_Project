@@ -183,6 +183,23 @@ for message in decoded_response['tx']['body']['messages']:
         print(f'Script {table_type} could not be found, error caused in block {file_name}', file=sys.stderr)
     i += 1
 
+    # Add the message to message_table_lookup
+    try:
+        if not table_type.isidentifier():
+            print(f"Error with loading block info in block {file_name}: {table_type} is not a valid table name", file=sys.stderr)
+            continue
+        query = f"SELECT message_id FROM {table_type} WHERE tx_id = %s;"
+
+        cursor.execute(query, (tx_id,))
+
+        message_id = cursor.fetchone()[0]
+
+        cursor.execute('INSERT INTO message_table_lookup (tx_id, message_id, message_table_name) VALUES (%s, %s, %s);', (tx_id, message_id, table_type))
+    
+        connection.commit()
+    except errors.UniqueViolation as e:
+        print(f"Error with loading block info in block {file_name}: {e}", file=sys.stderr)    
+
 cursor.close()
 connection.close()
 

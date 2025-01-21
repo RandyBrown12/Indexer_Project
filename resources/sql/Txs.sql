@@ -1252,11 +1252,11 @@ create index if not exists ibc_connectionopeninit_msg_tx_id
 
 create table if not exists message_table_lookup(
     message_table_id UUID default gen_random_uuid() not null primary key,
-    txs_id UUID not null,
+    tx_id UUID not null,
     message_id UUID not null,
     message_table_name VARCHAR not null,
     UNIQUE(message_id)     
 );
 
 create index if not exists message_table_lookup_txs_and_msg_id
-    on message_table_lookup (txs_id, message_id);
+    on message_table_lookup (tx_id, message_id);
