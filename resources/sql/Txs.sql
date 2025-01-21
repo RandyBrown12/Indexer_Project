@@ -1255,7 +1255,7 @@ create table if not exists message_table_lookup(
     tx_id UUID not null,
     message_id UUID not null,
     message_table_name VARCHAR not null,
-    UNIQUE(message_id)     
+    UNIQUE(message_id)
 );
 
 create index if not exists message_table_lookup_txs_and_msg_id

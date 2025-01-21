@@ -138,7 +138,7 @@ for message in decoded_response['tx']['body']['messages']:
         print(f"Transaction Table: {table_type}")
     except KeyError:
         
-        print(f"Error with loading block info in block " + file_name, file=sys.stderr)
+        print(f"Error with loading block info in block {file_name}", file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
         #new_type(str(message), output_path, height, order , i)
         continue
@@ -185,9 +185,10 @@ for message in decoded_response['tx']['body']['messages']:
 
     # Add the message to message_table_lookup
     try:
-        if not table_type.isidentifier():
-            print(f"Error with loading block info in block {file_name}: {table_type} is not a valid table name", file=sys.stderr)
+        if table_type not in type_json.values():
+            print(f"Error with loading block info in block {file_name}: {table_type} is not in type.json", file=sys.stderr)
             continue
+
         query = f"SELECT message_id FROM {table_type} WHERE tx_id = %s;"
 
         cursor.execute(query, (tx_id,))
