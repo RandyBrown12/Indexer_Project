@@ -17,3 +17,6 @@ nohup.out
 
 # Ignore .vscode
 .vscode/
+
+# Ignore Tasks List
+TaskList.md
