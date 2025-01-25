@@ -12,7 +12,8 @@ Creater Name: Ziqi Yang                                                         
 Published Date: 5/27/2024                                                           *
                                                                                     *
 Version: 1.0                                                                        *
-                                                                                   *
+Multisend has been updated to include all possible coins for a given output
+in the block JSON.                                                                                   *
                                                                                     *
                                                                                     *
 **********************************************************************************'''
@@ -27,7 +28,7 @@ import traceback
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 sys.path.append(parent_dir)
-import lib.address_load as address_load
+from address_load import main as address_load_main
 file_name = os.getenv('FILE_NAME')
 
 def main(tx_id, message_no, transaction_no, tx_type, message):
@@ -51,23 +52,22 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
 
         # Load the input addresses
         inputs_address = message['inputs'][0]['address']
-        inputs_key = 'inputs_address'
-        id = {}
-        id[f'{inputs_key}_id'] = address_load.main(inputs_address)
+        inputs_address_id = address_load_main(inputs_address)
 
         # Define the values
-        inputs_denom = message['inputs'][0]['coins'][0]['denom']
-        inputs_amount = message['inputs'][0]['coins'][0]['amount']
         messages = json.dumps(message)
         comment = ''
 
-
         # Edit the query that will be loaded to the database
         query = """
-        INSERT INTO cosmos_multisend_msg (tx_id, tx_type, inputs_address_id, inputs_denom, inputs_amount, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING message_id;
+        INSERT INTO cosmos_multisend_msg (tx_id, tx_type, inputs_address_id, message_info, comment) 
+        VALUES (%s, %s, %s, %s, %s) RETURNING message_id;
         """
 
-        values = (tx_id, tx_type, id['inputs_address_id'], inputs_denom, inputs_amount, messages, comment)
+        values = (tx_id, tx_type, inputs_address_id, messages, comment)
+        print(query)
+        print(values)
+
         cursor.execute(query, values)
         message_id = cursor.fetchone()[0]
 
@@ -79,20 +79,19 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
         # For the list, every output will be loaded to output table under multisend table, and address table
         for output in outputs:
             # Set the values
-            id = {}
             output_address = output['address']
-            output_key = 'outputs_address'
-            id[f'{output_key}_id'] = address_load.main(output_address)
-            outputs_denom = output['coins'][0]['denom']
-            outputs_amount = output['coins'][0]['amount']
 
+            output_address_id = address_load_main(output_address)
+            for index in range(len(output['coins'])):
+                outputs_denom = output['coins'][index]['denom']
+                outputs_amount = output['coins'][index]['amount']
 
-            query = """
-            INSERT INTO cosmos_multisend_outputs (message_id, outputs_address_id, outputs_denom, outputs_amount) VALUES (%s, %s, %s, %s);
-            """
+                query = """
+                INSERT INTO cosmos_multisend_outputs (message_id, outputs_address_id, outputs_denom, outputs_amount) VALUES (%s, %s, %s, %s);
+                """
 
-            values = (message_id, id['outputs_address_id'], outputs_denom, outputs_amount)
-            cursor.execute(query, values)
+                values = (message_id, output_address_id, outputs_denom, outputs_amount)
+                cursor.execute(query, values)
 
         connection.commit()
         connection.close()
@@ -102,8 +101,8 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
         print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
 
-    except errors.UniqueViolation as e:
-        pass
+    except Exception as e:
+        print(f"Error with loading block info in block {file_name}: {e}", file=sys.stderr)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(tx_id, message_no, transaction_no, tx_type, message)

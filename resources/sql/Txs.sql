@@ -35,6 +35,11 @@
 --- New table message_table_lookup has been created to perform a join
 --- between the message tables and the transaction table. An index
 --- has also been created using the tx_id and message_id columns.
+--- 
+--- Version 1.7
+--- Table cosmos_multisend_outputs has removed UNIQUE constraint and also
+--- removed inputs_denom and inputs_amount. Table cosmos_multisend_msg has
+--- removed UNIQUE constraint for now.
 ---------------------------------------------------------------------------
 SET client_min_messages TO WARNING;
 
@@ -935,13 +940,10 @@ create table if not exists cosmos_multisend_msg
     tx_id                           uuid             not null,
     tx_type                         VARCHAR          not null,
     inputs_address_id               uuid            not null,
-    inputs_denom                    VARCHAR          not null,
-    inputs_amount                   VARCHAR          not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
-    FOREIGN KEY (inputs_address_id) REFERENCES address(address_id),
-    UNIQUE(tx_id, comment)
+    FOREIGN KEY (inputs_address_id) REFERENCES address(address_id)
 );
 
 create index if not exists cosmos_multisend_inputs_address_id
@@ -953,15 +955,14 @@ create index if not exists cosmos_multisend_tx_id
 
 create table if not exists cosmos_multisend_outputs
 (
-    id         uuid default gen_random_uuid() not null
+    outputs_message_id         uuid default gen_random_uuid() not null
         primary key,
     message_id                       uuid             not null,
     outputs_address_id               uuid          not null,
     outputs_denom                    VARCHAR          not null,
     outputs_amount                   VARCHAR          not null,
     FOREIGN KEY (message_id) REFERENCES cosmos_multisend_msg(message_id),
-    FOREIGN KEY (outputs_address_id) REFERENCES address(address_id),
-    UNIQUE(outputs_address_id, outputs_denom, outputs_amount)
+    FOREIGN KEY (outputs_address_id) REFERENCES address(address_id)
 );
 
 create index if not exists cosmos_multisend_outputs_address_id
@@ -1254,9 +1255,21 @@ create table if not exists message_table_lookup(
     message_table_id UUID default gen_random_uuid() not null primary key,
     tx_id UUID not null,
     message_id UUID not null,
-    message_table_name VARCHAR not null,
-    UNIQUE(message_id)
+    message_table_name VARCHAR not null
 );
 
 create index if not exists message_table_lookup_txs_and_msg_id
     on message_table_lookup (tx_id, message_id);
+
+create table if not exists cosmos_setwithdrawaddress_msg (
+    message_id         uuid default gen_random_uuid() not null primary key,
+    tx_id                           uuid             not null,
+    tx_type                     VARCHAR             not null,
+    signer_id                      uuid             not null,
+    signer                          VARCHAR         ,
+    message_info                    jsonb            not null,
+    comment                         VARCHAR          not null,
+    FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
+    FOREIGN KEY (signer_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, comment)
+);

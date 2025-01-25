@@ -26,22 +26,21 @@ New column 'comment' for transaction table has been added                       
 Version: 1.3                                                                        *
 new function 'new_type' has been added. It can print the message of new type to     *
 another text file.                                                                  *
-KeyError output now can be printed into error log instead of output log             *
-                                                                                    *
+KeyError output now can be printed into error log instead of output log             *                                                                                    *
 **********************************************************************************'''
 
-#    Scripts start below
+# Dependencies Scripts start below
 import sys
 import json
 import importlib
-import address_load as address_load
 import os
-
-from utilities import check_file, create_connection, decode_tx, hash_to_hex
 from pathlib import Path
 from psycopg2 import errors
 import traceback
 
+# Local Scripts
+from utilities import check_file, create_connection, decode_tx, hash_to_hex
+import address_load as address_load
 
 # import the login info for psql from 'info.json'
 with open('info.json', 'r') as f:
@@ -178,8 +177,8 @@ for message in decoded_response['tx']['body']['messages']:
 
     except AttributeError:
         print(f'Script {table_type} does not have a main function, error caused in block {file_name}', file=sys.stderr)
-    except ImportError:
-        print(f'Script {table_type} could not be found, error caused in block {file_name}', file=sys.stderr)
+    except ImportError as e:
+        print(f'Script {table_type} could not be found, error caused in block {file_name}: {e}', file=sys.stderr)
     i += 1
 
     # Add the message to message_table_lookup
