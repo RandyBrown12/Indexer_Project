@@ -20,7 +20,7 @@ changed to only three condition, 'user', 'validator', and 'contract'.           
 **********************************************************************************'''
 
 #    Scripts start below
-from utilities import create_connection
+from utilities import create_connection_with_filepath_json
 from datetime import datetime
 import json
 import os
@@ -29,18 +29,8 @@ import sys
 
 def main(address):
     #print(address, sys.stderr)
-    
 
-    with open('info.json', 'r') as f:
-        info = json.load(f)
-
-    db_name = info['psql']['db_name']
-    db_user = info['psql']['db_user']
-    db_password = info['psql']['db_password']
-    db_host = info['psql']['db_host']
-    db_port = info['psql']['db_port']
-
-    connection = create_connection(db_name, db_user, db_password, db_host, db_port)
+    connection = create_connection_with_filepath_json()
     cursor = connection.cursor()
 
     file_name = os.getenv('FILE_NAME')

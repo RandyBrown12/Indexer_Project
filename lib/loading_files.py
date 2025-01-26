@@ -26,19 +26,10 @@ New package: psycopg2 now applies on this script                                
 import os
 import json
 import sys
-from utilities import check_file, create_connection, block_hash_base64_to_hex
+from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex
 from psycopg2 import errors
 
-with open('info.json', 'r') as f:
-    info = json.load(f)
-
-db_name = info['psql']['db_name']
-db_user = info['psql']['db_user']
-db_password = info['psql']['db_password']
-db_host = info['psql']['db_host']
-db_port = info['psql']['db_port']
-
-connection = create_connection(db_name, db_user, db_password, db_host, db_port)
+connection = create_connection_with_filepath_json()
 
 
 file_path = os.getenv('FILE_PATH')

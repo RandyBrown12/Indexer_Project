@@ -39,20 +39,12 @@ from psycopg2 import errors
 import traceback
 
 # Local Scripts
-from utilities import check_file, create_connection, decode_tx, hash_to_hex
+from utilities import check_file, create_connection_with_filepath_json, decode_tx, hash_to_hex
 import address_load as address_load
 
-# import the login info for psql from 'info.json'
-with open('info.json', 'r') as f:
-    info = json.load(f)
 
-db_name = info['psql']['db_name']
-db_user = info['psql']['db_user']
-db_password = info['psql']['db_password']
-db_host = info['psql']['db_host']
-db_port = info['psql']['db_port']
 
-connection = create_connection(db_name, db_user, db_password, db_host, db_port)
+connection = create_connection_with_filepath_json()
 cursor = connection.cursor()
 
 # Set the path of file

@@ -18,20 +18,11 @@ Version: 1.0                                                                    
 import os
 import sys
 import json
-from utilities import check_file, create_connection, block_hash_base64_to_hex, hash_to_hex, decode_tx, time_parse
+from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex, hash_to_hex, decode_tx, time_parse
 from psycopg2 import errors#  compare_nested_json,
 from datetime import timezone
 
-with open("info.json", "r") as f:
-    info = json.load(f)
-
-db_name = info["psql"]["db_name"]
-db_user = info["psql"]["db_user"]
-db_password = info["psql"]["db_password"]
-db_host = info["psql"]["db_host"]
-db_port = info["psql"]["db_port"]
-
-connection = create_connection(db_name, db_user, db_password, db_host, db_port)
+connection = create_connection_with_filepath_json()
 
 #block_path = info["path"]["block_file_path"]
 #for dirName, subDirList, fileList in os.walk(block_path):

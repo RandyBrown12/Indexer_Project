@@ -1,63 +1,50 @@
-# !/usr/bin/python3
 '''**********************************************************************************
                                                                                     *
-Project Name: cosmos_deposit_msg.py                                *
+Project Name: cosmos_setwithdrawaddress_msg.py                                      *
                                                                                     *
-Programming Language: Python 3.11                                                   *
+Programming Language: Python 3.11                                                   *                                                                                    *
                                                                                     *
-Libraries: json                                                                     *
+Creater Name: Randy Brown                                                           *
                                                                                     *
-Creater Name: Ziqi Yang                                                             *
-                                                                                    *
-Published Date: 11/06/2024                                                           *
+Published Date: 1/26/2025                                                           *
                                                                                     *
 Version: 1.0                                                                        *
-                                                                                    *
-                                                                                    *
+Initialized Insertion into cosmos_setwirhdrawaddress_msg table.                     *
                                                                                     *
 **********************************************************************************'''
 
-#    Scripts start below
+# Libraries below
 from utilities import create_connection_with_filepath_json
 import json
 import sys
 import os
-import traceback
 from psycopg2 import errors
 
 def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
-    
-    
-
-    
 
     connection = create_connection_with_filepath_json()
     cursor = connection.cursor()
     file_name = os.getenv('FILE_NAME')
-    try:
 
+    try:
         # Define the values
-        proposal_id = message['proposal_id']
-        deposit_denom = message['amount'][0]['denom']
-        deposit_amount = message['amount'][0]['amount']
         message = json.dumps(message)
         comment = ''
 
-        #  Edit the query that will be loaded to the database
+        # Edit the query that will be loaded to the database
         query = """
-        INSERT INTO cosmos_deposit_msg (tx_id, tx_type, depositor_id, proposal_id, deposit_denom, deposit_amount, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s,%s,%s);
+        INSERT INTO cosmos_setwithdrawaddress_msg (tx_id, tx_type, signer_id, signer, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s);
         """
 
-        values = (tx_id, tx_type, ids['depositor_id'], proposal_id, deposit_denom, deposit_amount, message,comment)
+        values = (tx_id, tx_type, ids['signer_id'], 'None', message, comment)
         cursor.execute(query, values)
 
         connection.commit()
         connection.close()
     except KeyError:
-        
+ 
         print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
-        print(traceback.format_exc(), file=sys.stderr)
     except errors.UniqueViolation as e:
         pass
 

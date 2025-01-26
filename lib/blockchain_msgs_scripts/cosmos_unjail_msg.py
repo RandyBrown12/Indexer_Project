@@ -19,7 +19,7 @@ Version: 1.0                                                                    
 **********************************************************************************'''
 
 #    Scripts start below
-from utilities import create_connection
+from utilities import create_connection_with_filepath_json
 import json
 import sys
 import os
@@ -28,19 +28,14 @@ from psycopg2 import errors
 
 def main(tx_id, message_no, transaction_no, tx_type, message,  ids):
 
-    # import the login info for psql from 'info.json'
-    with open('info.json', 'r') as f:
-        info = json.load(f)
+    
+    
 
-    db_name = info['psql']['db_name']
-    db_user = info['psql']['db_user']
-    db_password = info['psql']['db_password']
-    db_host = info['psql']['db_host']
-    db_port = info['psql']['db_port']
+    
     file_name = os.getenv('FILE_NAME')
     try:
         # Define the values
-        connection = create_connection(db_name, db_user, db_password, db_host, db_port)
+        connection = create_connection_with_filepath_json()
         cursor = connection.cursor()
         message = json.dumps(message)
         comment = ''

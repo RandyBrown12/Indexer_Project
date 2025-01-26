@@ -190,19 +190,26 @@ def decode_tx(tx, max_retries=3, retry_delay=5):
                 current_retries -= 1
     return None
 
-def create_connection(db_name, db_user, db_password, db_host, db_port):
+def create_connection_with_filepath_json():
     connection = None
     try:
+
+        with open('info.json', 'r') as f:
+            info = json.load(f)
+
         connection = psycopg2.connect(
-            database=db_name,
-            user=db_user,
-            password=db_password,
-            host=db_host,
-            port=db_port,
+            database=info['psql']['db_name'],
+            user=info['psql']['db_user'],
+            password=info['psql']['db_password'],
+            host=info['psql']['db_host'],
+            port=info['psql']['db_port'],
         )
         #print("Connection to PostgreSQL DB successful")#
     except OperationalError as e:
         print(f"The error '{e}' occurred")
+    except Exception as e:
+        print(f"Error while connecting to the database: {e}", file=sys.stderr)
+    
     return connection
 
 def hash_to_hex(data: str) -> str:
