@@ -60,8 +60,6 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
         """
 
         values = (tx_id, tx_type, inputs_address_id, messages, comment)
-        print(query)
-        print(values)
 
         cursor.execute(query, values)
         message_id = cursor.fetchone()[0]
