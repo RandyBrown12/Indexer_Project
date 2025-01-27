@@ -153,10 +153,11 @@ def new_type(message, file_path, height, transaction_num, message_num):
             file.write(message + '\n' + '\n')
 
 
-def decode_tx(tx, max_retries=3, retry_delay=5):
+def decode_tx(tx, max_retries=9, retry_delay=5):
     """
     Decodes a transaction using external APIs.
-
+    Uses round-robin technique to better handle 500 errors.
+    
     Args:
         tx: The transaction to decode.
         max_retries: Maximum number of retries for the request.
@@ -169,25 +170,24 @@ def decode_tx(tx, max_retries=3, retry_delay=5):
     headers = {'Content-Type': 'application/json'}
     data = json.dumps({"tx_bytes": tx})
 
-    for url in url_array:
-        current_retries = max_retries
-        while current_retries > 0:
-            try:
-                full_url = url + "cosmos/tx/v1beta1/decode"
-                response = requests.post(full_url, headers=headers, data=data, timeout=5)  # Adding a 5-second timeout
-                if response.status_code == 200:
-                    return response.json()
+    current_retries = 0
+    while current_retries < max_retries:
+        try:
+            full_url = f"{url_array[current_retries % len(url_array)]}cosmos/tx/v1beta1/decode"
+            response = requests.post(full_url, headers=headers, data=data, timeout=5)  # Adding a 5-second timeout
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f"Error: Unable to decode transaction, server returned status code {response.status_code} using {full_url}", file=sys.stderr)
+                if response.status_code in [500, 502, 503, 504]:  # Retry on certain status codes
+                    time.sleep(retry_delay)
+                    current_retries += 1
                 else:
-                    print(f"Error: Unable to decode transaction, server returned status code {response.status_code} using {full_url}", file=sys.stderr)
-                    if response.status_code in [502, 503, 504]:  # Retry on certain status codes
-                        time.sleep(retry_delay)
-                        current_retries -= 1
-                    else:
-                        break  # Do not retry on other errors
-            except requests.exceptions.RequestException as e:
-                print(f"Network request error: {e} using {full_url}", file=sys.stderr)
-                time.sleep(retry_delay)
-                current_retries -= 1
+                    break  # Do not retry on other errors
+        except requests.exceptions.RequestException as e:
+            print(f"Network request error: {e} using {full_url}", file=sys.stderr)
+            time.sleep(retry_delay)
+            current_retries += 1
     return None
 
 def create_connection_with_filepath_json():
