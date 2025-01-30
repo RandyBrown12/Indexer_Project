@@ -23,6 +23,10 @@ Version: 1.2                                                                    
 Comment has been updated. tx_id has been replaced to transaction order.             *
 KeyError output now can be printed into error log instead of output log             *                                                                                    *
                                                                                     *
+Version: 1.3                                                                        *
+Instantiate_Permission now grabs the permission key instead of the whole JSON.      *
+Set the instantiate_permission to 'No Permission is given' if it is None.           *
+                                                                                    *
 **********************************************************************************'''
 
 #    Scripts start below
@@ -33,12 +37,7 @@ import os
 import traceback
 from psycopg2 import errors
 
-def main(tx_id, message_no, transaction_no, tx_type, message, ids):
-
-    
-    
-
-    
+def main(tx_id, message_no, transaction_no, tx_type, message, ids):    
 
     connection = create_connection_with_filepath_json()
     cursor = connection.cursor()
@@ -54,9 +53,9 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         wasm_byte_code = message['wasm_byte_code']
         # If the value is NULL, make it as '', avoiding the error
         if message['instantiate_permission'] == None:
-            instantiate_permission = []
+            instantiate_permission = 'No Permission is given'
         else:
-            instantiate_permission = message['instantiate_permission']
+            instantiate_permission = message['instantiate_permission']['permission']
         message = json.dumps(message)
         comment = ''
 
