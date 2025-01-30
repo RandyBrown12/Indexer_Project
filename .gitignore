@@ -5,7 +5,7 @@ test_blocks_custom/
 info.json
 
 # Ignore log files
-log/
+log*/
 
 # Ignore pycaches
 __pycache__/
