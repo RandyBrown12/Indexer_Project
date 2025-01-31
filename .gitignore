@@ -1,6 +1,6 @@
 # Ignore test_blocks4 because of size
 test_blocks4/
-test_blocks_custom/
+test_blocks_*/
 # Ignore info.json
 info.json
 
