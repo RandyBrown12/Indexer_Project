@@ -35,11 +35,6 @@ from psycopg2 import errors
 
 def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
-    
-    
-
-    
-
     connection = create_connection_with_filepath_json()
     cursor = connection.cursor()
     file_name = os.getenv('FILE_NAME')
@@ -47,7 +42,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
     try:
         # Edit the query that will be loaded to the database
         query = """
-                INSERT INTO cosmwasm_instantiatecontract_msg (tx_id, tx_type, send_address_id, admin_address_id, code_id, label, msg,funds, message_info, comment) 
+                INSERT INTO cosmwasm_instantiatecontract_msg (tx_id, tx_type, send_address_id, admin_address_id, code_id, label, msg, funds, message_info, comment) 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 """
 
@@ -55,12 +50,11 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         code_id = message['code_id']
         label = message['label']
         msg = list(message['msg'])
-        funds = message['funds']
+        funds = json.dumps(message['funds'])
         message = json.dumps(message)
         comment = ''
 
-
-        values = (tx_id, tx_type, ids['sender_id'], ids['admin_id'], code_id, label, msg,funds, message,comment)
+        values = (tx_id, tx_type, ids['sender_id'], ids['admin_id'], code_id, label, msg, funds, message, comment)
         cursor.execute(query, values)
 
         connection.commit()
