@@ -40,6 +40,10 @@
 --- Table cosmos_multisend_outputs has removed UNIQUE constraint and also
 --- removed inputs_denom and inputs_amount. Table cosmos_multisend_msg has
 --- removed UNIQUE constraint for now.
+--- 
+--- Version 1.8
+--- Table cosmos_setwithdrawaddress_msg has been added with delegation_address_id
+--- and withdraw_address_id for the columns.
 ---------------------------------------------------------------------------
 SET client_min_messages TO WARNING;
 
@@ -1265,11 +1269,11 @@ create table if not exists cosmos_setwithdrawaddress_msg (
     message_id         uuid default gen_random_uuid() not null primary key,
     tx_id                           uuid             not null,
     tx_type                     VARCHAR             not null,
-    signer_id                      uuid             not null,
-    signer                          VARCHAR         ,
+    delegator_address_id            uuid             not null,
+    withdraw_address_id            uuid             not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
-    FOREIGN KEY (signer_id) REFERENCES address(address_id),
-    UNIQUE(tx_id, comment)
+    FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
+    UNIQUE(tx_id, delegator_address_id, withdraw_address_id)
 );

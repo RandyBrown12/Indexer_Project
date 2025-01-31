@@ -9,8 +9,10 @@ Creater Name: Randy Brown                                                       
 Published Date: 1/26/2025                                                           *
                                                                                     *
 Version: 1.0                                                                        *
-Initialized Insertion into cosmos_setwirhdrawaddress_msg table.                     *
+Initialized Insertion into cosmos_setwithdrawaddress_msg table.                     *
                                                                                     *
+Version: 1.1                                                                        *                           
+Updated query to fit Version 1.8 cosmos_setwithdrawaddress_msg table.               *
 **********************************************************************************'''
 
 # Libraries below
@@ -34,10 +36,10 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
         # Edit the query that will be loaded to the database
         query = """
-        INSERT INTO cosmos_setwithdrawaddress_msg (tx_id, tx_type, signer_id, signer, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s);
+        INSERT INTO cosmos_setwithdrawaddress_msg (tx_id, tx_type, delegator_address_id, withdraw_address_id, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s);
         """
 
-        values = (tx_id, tx_type, ids['signer_id'], 'None', message, comment)
+        values = (tx_id, tx_type, ids['delegator_address_id'], ids['withdraw_address_id'], message, comment)
         cursor.execute(query, values)
 
         connection.commit()
