@@ -221,8 +221,8 @@ for file_name in $files; do
     # if python_three is true, run python3
     if [[ $python_three == true ]]; then
         python3 $(pwd)/lib/check_one_file.py >> $BLOCKS_LOG 2>> $ERR
-        # Error code 8 means the block does not pass the validation
-        if [[ $? == 8 ]]; then
+        # An error code 0 means the block does not pass the validation
+        if [[ $? -ne 0 ]]; then
             echo "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
