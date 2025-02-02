@@ -32,17 +32,7 @@ result = check_file(file_path, file_name)
 height = height_check(result, file_name)
 
 # Check if this file passes JSON Schema test. 1 is the specific case that passes.
-if validate_json(result, file_name) == 1:
-
-    # Count numbers of transactions in this block
-    count = len(result["block"]["data"]["txs"])
-
-    # Display transaction
-    if count == 0:
-        sys.exit(10)
-    else:
-        sys.exit(0)
-else:
+if validate_json(result, file_name) == 0:
     foundError = checkLine(file_name, 1)
     if(foundError >= 0):
        try:

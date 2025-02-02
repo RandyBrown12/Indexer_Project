@@ -77,10 +77,6 @@ def check_file(file_path,file_name):
 
     except json.JSONDecodeError:
         print(f"{file_name} is not a JSON file.", file=sys.stderr)
-        file = open(file_path, "r")
-        print(file)
-        checkLine(file_path, file_name,len(file.readlines()) - 1)
-        file.close()
         sys.exit(3)
 
     except ValueError as e:
