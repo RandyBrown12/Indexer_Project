@@ -46,7 +46,7 @@ try:
     tx_num = len(content['block']['data']['txs'])
     created_time = content['block']['header']['time']
 except Exception as e:
-    print(f"Error with loading block info in block " + file_name, file=sys.stderr)
+    print(f"Error with loading block info in block {file_name} ", file=sys.stderr)
     sys.exit(6)
 
 # Edit the query that will be loaded to the database
@@ -62,8 +62,10 @@ try:
     cursor.execute(query, values)
 except errors.UniqueViolation as e:
     print(f"Unique value has occured: {e}")
+    connection.rollback()
+    cursor.close()
     sys.exit(6)
-connection.commit()
 
+connection.commit()
 print(f"File: {file_name} has been loaded!")
 cursor.close()
