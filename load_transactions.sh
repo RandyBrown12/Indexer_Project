@@ -204,57 +204,79 @@ if [[ $verbose == true ]]; then
     echo "Txs.sql has been executed."
 fi
 
+# Add system exit code
+PROGRAM_EXIT_CODE=0
+
 for file_name in $files; do
     # if folder_path does not end with /, add / to the end
     if [[ $folder_path != */ ]]; then
         folder_path="${folder_path}/"
     fi
+
     export FILE_PATH="${folder_path}${file_name}"
     export FILE_NAME="${file_name}"
+
     # if python_three is true, run python3
     if [[ $python_three == true ]]; then
+
         python3 "$(pwd)/lib/check_one_file.py" >> $BLOCKS_LOG 2>> $ERR
+        $PROGRAM_EXIT_CODE=$?
         # An error code 0 means the block does not pass the validation
-        if [[ $? -ne 0 ]]; then
-            echo "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information"
+        if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
+            echo "$FILE_NAME does not pass the JSON validation. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
         fi
+
         python3 "$(pwd)/lib/loading_files.py" >> $BLOCKS_LOG 2>> $ERR
-        if [[ $? -ne 0 ]]; then
-            echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
+        PROGRAM_EXIT_CODE=$?
+
+        if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
+            echo "$FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
+
         python3 "$(pwd)/lib/verify_block.py" >> $BLOCKS_LOG 2>> $ERR
-        if [[ $? -ne 0 ]]; then
-            echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information"
+        PROGRAM_EXIT_CODE=$?
+
+        if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
+            echo "$FILE_NAME does not pass the verification test. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the verification test."
         fi
+
         block_count=$((block_count+1))
     # Run regular Python
     else
         python "$(pwd)/lib/check_one_file.py" >> $BLOCKS_LOG 2>> $ERR
-        if [[ $? == 8 ]]; then
-            echo "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information"
+        PROGRAM_EXIT_CODE=$?
+
+        if [[ $((PROGRAM_EXIT_CODE)) == 8 ]]; then
+            echo "$FILE_NAME does not pass the JSON validation. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
         fi
+
         python "$(pwd)/lib/loading_files.py" >> $BLOCKS_LOG 2>> $ERR
-        if [[ $? -ne 0 ]]; then
-	        echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
+        PROGRAM_EXIT_CODE=$?
+
+        if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
+	        echo "$FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
+        
         python "$(pwd)/lib/verify_block.py" >> $BLOCKS_LOG 2>> $ERR
-        if [[ $? -ne 0 ]]; then
-            echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information"
+        PROGRAM_EXIT_CODE=$?
+
+        if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
+            echo "$FILE_NAME does not pass the verification test. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the verification test."
@@ -277,15 +299,17 @@ for file_name in $files; do
             if [[ $python_three == true ]]; then
                 python3 "$(pwd)/lib/loading_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
                 python3 "$(pwd)/lib/verify_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
-                if [[ $? -ne 0 ]]; then
-                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
+                PROGRAM_EXIT_CODE=$?
+                if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
+                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
                     continue
                 fi
             else
                 python "$(pwd)/lib/loading_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
                 python "$(pwd)/lib/verify_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
-                if [[ $? -ne 0 ]]; then
-                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
+                PROGRAM_EXIT_CODE=$?
+                if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
+                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
                     continue
                 fi
             fi
