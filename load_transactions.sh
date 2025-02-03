@@ -70,9 +70,9 @@ die()
 # Get command line options
 #
 python_three=false
-info_path=$(pwd)/info.json
+info_path="$(pwd)/info.json"
 folder_path=""
-txt=$(pwd)/log
+txt="$(pwd)/log"
 verbose=false
 block_count=0
 txn_count=0
@@ -152,35 +152,28 @@ files=$(ls $folder_path)
 #     mkdir $txt
 # fi
 
-if [[ -f $txt/blocks.log ]]; then
-    rm $txt/blocks.log #:
+if [[ -f "$txt/blocks.log" ]]; then
+    rm "$txt/blocks.log"
   else
-    touch $txt/blocks.log
+    touch "$txt/blocks.log"
 fi
 
-if [[ -f $txt/error.log ]]; then
-    rm $txt/error.log
+if [[ -f "$txt/error.log" ]]; then
+    rm "$txt/error.log"
   else
-    touch $txt/error.log
+    touch "$txt/error.log"
 fi
 
-if [[ -f $txt/transactions.log ]]; then
-    rm $txt/transactions.log #:
+if [[ -f "$txt/transactions.log" ]]; then
+    rm "$txt/transactions.log"
   else
-    touch $txt/transactions.log
-fi
-
-if [[ -f $txt/test.log ]]; then
-    rm $txt/test.log #:
-  else
-    touch $txt/test.log
+    touch "$txt/transactions.log"
 fi
 
 # Set the path of log files
-export BLOCKS_LOG=$txt/blocks.log
-export TRANSACTIONS_LOG=$txt/transactions.log
-export TEST=$txt/test.log
-export ERR=$txt/error.log
+export BLOCKS_LOG="$txt/blocks.log"
+export TRANSACTIONS_LOG="$txt/transactions.log"
+export ERR="$txt/error.log"
 
 # Set the values of psql login info
 DBNAME=$(jq -r '.psql.db_name' $info_path)
@@ -201,7 +194,7 @@ DBPORT=$(jq -r '.psql.db_port' $info_path)
 
 # Connect to psql
 
-PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h $DBHOST -p $DBPORT -f "$(pwd)"/resources/sql/Txs.sql --quiet --set ON_ERROR_STOP=1
+PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h $DBHOST -p $DBPORT -f "$(pwd)/resources/sql/Txs.sql" --quiet --set ON_ERROR_STOP=1
 
 if [[ $? -ne 0 ]]; then
     die "Error---->Txs.sql had an error. (Exit code $?). Check log file for more information" 9
@@ -220,7 +213,7 @@ for file_name in $files; do
     export FILE_NAME="${file_name}"
     # if python_three is true, run python3
     if [[ $python_three == true ]]; then
-        python3 $(pwd)/lib/check_one_file.py >> $BLOCKS_LOG 2>> $ERR
+        python3 "$(pwd)/lib/check_one_file.py" >> $BLOCKS_LOG 2>> $ERR
         # An error code 0 means the block does not pass the validation
         if [[ $? -ne 0 ]]; then
             echo "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information"
@@ -228,14 +221,14 @@ for file_name in $files; do
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
         fi
-        python3 $(pwd)/lib/loading_files.py >> $BLOCKS_LOG 2>> $ERR
+        python3 "$(pwd)/lib/loading_files.py" >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
             echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
-        python3 $(pwd)/lib/verify_block.py >> $BLOCKS_LOG 2>> $ERR
+        python3 "$(pwd)/lib/verify_block.py" >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
             echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information"
             continue
@@ -245,21 +238,21 @@ for file_name in $files; do
         block_count=$((block_count+1))
     # Run regular Python
     else
-        python $(pwd)/lib/check_one_file.py >> $BLOCKS_LOG 2>> $ERR
+        python "$(pwd)/lib/check_one_file.py" >> $BLOCKS_LOG 2>> $ERR
         if [[ $? == 8 ]]; then
             echo "$FILE_NAME does not pass the JSON validation. (Exit code $?). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
         fi
-        python $(pwd)/lib/loading_files.py >> $BLOCKS_LOG 2>> $ERR
+        python "$(pwd)/lib/loading_files.py" >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
 	        echo "$FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
         fi
-        python $(pwd)/lib/verify_block.py >> $BLOCKS_LOG 2>> $ERR
+        python "$(pwd)/lib/verify_block.py" >> $BLOCKS_LOG 2>> $ERR
         if [[ $? -ne 0 ]]; then
             echo "$FILE_NAME does not pass the verification test. (Exit code $?). Check log file for more information"
             continue
@@ -282,15 +275,15 @@ for file_name in $files; do
         for ((i = 0; i < $length; i++)); do
             export x=$i
             if [[ $python_three == true ]]; then
-                python3 $(pwd)/lib/loading_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
-                python3 $(pwd)/lib/verify_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
+                python3 "$(pwd)/lib/loading_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
+                python3 "$(pwd)/lib/verify_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
                 if [[ $? -ne 0 ]]; then
                     echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
                     continue
                 fi
             else
-                python $(pwd)/lib/loading_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
-                python $(pwd)/lib/verify_tx.py >> $TRANSACTIONS_LOG 2>> $ERR
+                python "$(pwd)/lib/loading_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
+                python "$(pwd)/lib/verify_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
                 if [[ $? -ne 0 ]]; then
                     echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $?). Check log file for more information"
                     continue
@@ -305,6 +298,7 @@ for file_name in $files; do
         echo "There are no transactions in $FILE_NAME."
     fi
 done
+
 echo ""
 echo "$block_count blocks were processed."
 echo "$txn_count transactions were processed."
