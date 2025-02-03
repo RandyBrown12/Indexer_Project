@@ -50,7 +50,7 @@ SET client_min_messages TO WARNING;
 create extension if not exists "pgcrypto";
 
 -- Block table 
-# TX_NUM should be NUMERIC
+-- TX_NUM should be NUMERIC
 create table if not exists blocks
 (
     block_id        uuid default gen_random_uuid() not null
