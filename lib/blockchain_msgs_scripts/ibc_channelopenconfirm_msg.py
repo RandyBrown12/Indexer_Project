@@ -22,7 +22,9 @@ New column 'comment' for transaction table has been added                       
 Version: 1.2                                                                        *
 Comment has been updated. tx_id has been replaced to transaction order.             *
 KeyError output now can be printed into error log instead of output log             *                                                                                    *
-                                                                                    *
+
+Version: 1.3
+Changed signe_id to signer_id is fixed for the table for INSERT INTO query on line 51.                                                                                    *
 **********************************************************************************'''
 
 #    Scripts start below

@@ -44,6 +44,9 @@
 --- Version 1.8
 --- Table cosmos_setwithdrawaddress_msg has been added with delegation_address_id
 --- and withdraw_address_id for the columns.
+---
+--- Version 1.9
+--- Table blocks has been changed to have tx_num and height as NUMERIC
 ---------------------------------------------------------------------------
 SET client_min_messages TO WARNING;
 
