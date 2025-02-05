@@ -17,7 +17,7 @@ content = check_file(file_path, file_name)
 block_hash = content["block_id"]["hash"]
 block_hash_hex = block_hash_base64_to_hex(block_hash)
 chain_id = content["block"]["header"]["chain_id"]
-height = content["block"]["header"]["height"]
+height = int(content["block"]["header"]["height"])
 tx_num = int(len(content["block"]["data"]["txs"]))
 created_time = content["block"]["header"]["time"]
 

@@ -57,7 +57,7 @@ create table if not exists blocks
         primary key,    
     block_hash      VARCHAR                   not null,   
     chain_id        VARCHAR                   not null,
-    height          VARCHAR                   not null,
+    height          NUMERIC                   not null,
     tx_num          NUMERIC                  not null,
     created_at      timestamp with time zone                     not null,
     UNIQUE (chain_id, height)
