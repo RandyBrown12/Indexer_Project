@@ -1280,3 +1280,9 @@ create table if not exists cosmos_setwithdrawaddress_msg (
     FOREIGN KEY (delegator_address_id) REFERENCES address(address_id),
     UNIQUE(tx_id, delegator_address_id, withdraw_address_id)
 );
+
+create table if not exists error_logs (
+    error_log_id uuid default gen_random_uuid() not null primary key,
+    error_log_timestamp timestamp with time zone not null,
+    error_log_message VARCHAR
+);

@@ -18,7 +18,8 @@
 #                   exit 6 ---- The block was not successfully loaded into the database.#
 #                   exit 7 ---- The block does not pass the verification test.  	#
 #                   exit 8 ---- The transaction was not loaded into the database. 	#
-#                   exit 9 --- Error in executing Txs.sql                    		#
+#                   exit 9 ---- The transaction was not verified                    #
+#                   exit 10 --- Error in executing Txs.sql                    		#
 #                                                                               	#
 # DEVELOPER: Randy Brown                                      		                #
 # DEVELOPER PHONE: +1 (405) 318-5961                                            	#
@@ -40,6 +41,9 @@
 #                                                                                   #
 # VERSION: 1.4                                                                      #
 # Added Txs.sql Version 1.6 to load_transactions.sh.                                #
+#                                                                                   #
+# VERSION: 1.5                                                                      #
+# Created a Database Table called ERROR_LOGS and                                    #
 #***********************************************************************************#
 
 
@@ -197,7 +201,7 @@ DBPORT=$(jq -r '.psql.db_port' $info_path)
 PGPASSWORD=$DBPASSWORD psql -d $DBNAME -U $DBUSER -h $DBHOST -p $DBPORT -f "$(pwd)/resources/sql/Txs.sql" --quiet --set ON_ERROR_STOP=1
 
 if [[ $? -ne 0 ]]; then
-    die "Error---->Txs.sql had an error. (Exit code $?). Check log file for more information" 9
+    die "Error---->Txs.sql had an error. (Exit code 10). Check log file for more information" 10
 fi
 
 if [[ $verbose == true ]]; then
@@ -223,7 +227,7 @@ for file_name in $files; do
         $PROGRAM_EXIT_CODE=$?
         # An error code 0 means the block does not pass the validation
         if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
-            echo "$FILE_NAME does not pass the JSON validation. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
+            echo "$FILE_NAME does not pass the JSON validation. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
@@ -233,7 +237,7 @@ for file_name in $files; do
         PROGRAM_EXIT_CODE=$?
 
         if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
-            echo "$FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
+            echo "$FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
@@ -243,7 +247,7 @@ for file_name in $files; do
         PROGRAM_EXIT_CODE=$?
 
         if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
-            echo "$FILE_NAME does not pass the verification test. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
+            echo "$FILE_NAME does not pass the verification test. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the verification test."
@@ -256,7 +260,7 @@ for file_name in $files; do
         PROGRAM_EXIT_CODE=$?
 
         if [[ $((PROGRAM_EXIT_CODE)) == 8 ]]; then
-            echo "$FILE_NAME does not pass the JSON validation. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
+            echo "$FILE_NAME does not pass the JSON validation. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the JSON validation."
@@ -266,7 +270,7 @@ for file_name in $files; do
         PROGRAM_EXIT_CODE=$?
 
         if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
-	        echo "$FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
+	        echo "$FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME is successfully loaded into the database."
@@ -276,7 +280,7 @@ for file_name in $files; do
         PROGRAM_EXIT_CODE=$?
 
         if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
-            echo "$FILE_NAME does not pass the verification test. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
+            echo "$FILE_NAME does not pass the verification test. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
             continue
         elif [[ $verbose == true ]]; then
             echo -e "$FILE_NAME passes the verification test."
@@ -301,7 +305,7 @@ for file_name in $files; do
                 python3 "$(pwd)/lib/verify_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
                 PROGRAM_EXIT_CODE=$?
                 if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
-                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
+                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
                     continue
                 fi
             else
@@ -309,7 +313,7 @@ for file_name in $files; do
                 python "$(pwd)/lib/verify_tx.py" >> $TRANSACTIONS_LOG 2>> $ERR
                 PROGRAM_EXIT_CODE=$?
                 if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
-                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log file for more information"
+                    echo "Error---->Transaction $i in $FILE_NAME loading into database failed. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
                     continue
                 fi
             fi

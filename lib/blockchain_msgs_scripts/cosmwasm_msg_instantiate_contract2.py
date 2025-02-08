@@ -5,13 +5,9 @@ import sys
 import os
 import traceback
 from psycopg2 import errors
+import datetime
 
 def main(tx_id, message_no, transaction_no, tx_type, message, ids):
-
-    
-    
-
-    
 
     connection = create_connection_with_filepath_json()
     cursor = connection.cursor()
@@ -27,7 +23,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         sender = ids['sender_id']
         admin = ids['admin_id']
         if(sender != ids['sender_id']):
-            sender = message['sender']#s
+            sender = message['sender']
         if(admin != ids['admin_id']):
             admin = message['admin']
         code_id = message['code_id']
@@ -40,16 +36,15 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
         values = (tx_id, tx_type, sender, admin, code_id, label, msg,funds, message,comment)
         cursor.execute(query, values)
-
+    except Exception as e:
+        connection.rollback()
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.datetime.now(), repr(e))
+        cursor.execute(query, values)
+    finally:
         connection.commit()
+        cursor.close()
         connection.close()
-
-    except KeyError:
-
-        print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
-        print(traceback.format_exec(), file=sys.stderr)
-    except errors.UniqueViolation as e:
-        pass
 
 if __name__ == '__main__':
     main(tx_id, message_no, transaction_no, tx_type, message, ids)

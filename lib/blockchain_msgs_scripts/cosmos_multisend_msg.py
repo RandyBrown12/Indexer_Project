@@ -25,6 +25,8 @@ from psycopg2 import errors
 import sys
 import os
 import traceback
+import datetime
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 sys.path.append(parent_dir)
@@ -32,11 +34,6 @@ from address_load import main as address_load_main
 file_name = os.getenv('FILE_NAME')
 
 def main(tx_id, message_no, transaction_no, tx_type, message):
-
-    
-    
-
-    
 
     try:
 
@@ -85,17 +82,16 @@ def main(tx_id, message_no, transaction_no, tx_type, message):
 
                 values = (message_id, output_address_id, outputs_denom, outputs_amount)
                 cursor.execute(query, values)
-
-        connection.commit()
-        connection.close()
-
-    except KeyError:
-
-        print(f'KeyError happens in type {tx_type} in block {file_name}', file=sys.stderr)
-        print(traceback.format_exc(), file=sys.stderr)
-
+                connection.commit()
     except Exception as e:
-        print(f"Error with loading block info in block {file_name}: {e}", file=sys.stderr)
+        connection.rollback()
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.datetime.now(), repr(e))
+        cursor.execute(query, values)
+    finally:
+        connection.commit()
+        cursor.close()
+        connection.close()
 
 if __name__ == "__main__":
     main(tx_id, message_no, transaction_no, tx_type, message)

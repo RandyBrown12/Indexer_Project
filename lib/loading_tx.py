@@ -41,11 +41,12 @@ import traceback
 # Local Scripts
 from utilities import check_file, create_connection_with_filepath_json, decode_tx, hash_to_hex
 import address_load as address_load
-
+import datetime
 
 
 connection = create_connection_with_filepath_json()
 cursor = connection.cursor()
+hasErrorLog = True
 
 # Set the path of file
 file_path = os.getenv('FILE_PATH')
@@ -86,25 +87,28 @@ try:
     comment = ''
     tx_info = json.dumps(decoded_response)
 except Exception as e:
-    
-    print(f"Error with loading block info in block " + file_name, file=sys.stderr)
-    print(traceback.format_exc(), file=sys.stderr)
-    raise
+    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+    values = (datetime.datetime.now(), repr(e))
+    cursor.execute(query, values)
+    connection.commit()
+    hasErrorLog = True
 
 # Edit the query that will be loaded to the database
-query = """
-INSERT INTO transactions (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING tx_id;
-"""
-values = (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_time, tx_info, comment)
-
 try:
+    query = """
+            INSERT INTO transactions (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING tx_id;
+            """
+    values = (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_time, tx_info, comment)
     cursor.execute(query, values)
     tx_id = cursor.fetchone()[0]
-except errors.UniqueViolation as e:
+except Exception as e:
     connection.rollback()
-    cursor.execute("SELECT tx_id FROM transactions WHERE block_id = %s", (block_id,))
-    tx_id = cursor.fetchone()[0]
-connection.commit()
+    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+    values = (datetime.datetime.now(), repr(e))
+    cursor.execute(query, values)
+    hasErrorLog = True
+finally:
+    connection.commit()
 
 
 
@@ -120,19 +124,16 @@ i = 1
 for message in decoded_response['tx']['body']['messages']:
 
     # Define the type of message to find the corresponding python script
-    
-    type = message['@type']
-
     try:
+        type = message['@type']
         table_type = type_json[type]
         print(f"Transaction Table: {table_type}")
-    except KeyError:
-        
-        print(f"Error with loading block info in block {file_name}", file=sys.stderr)
-        print(traceback.format_exc(), file=sys.stderr)
-        #new_type(str(message), output_path, height, order , i)
-        continue
-
+    except KeyError as e:
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.datetime.now(), e)
+        cursor.execute(query, values)
+        connection.commit()
+        hasErrorLog = True
     ids = {}
     for key in message:
         # Use keywords to catch address keys
@@ -145,9 +146,14 @@ for message in decoded_response['tx']['body']['messages']:
     # Load the type and height to type table
     try:
         cursor.execute('INSERT INTO type (type, height) VALUES (%s, %s);', (type, height))
-    except errors.UniqueViolation as e:
-        pass
-    connection.commit()
+    except Exception as e:
+        connection.rollback()
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.datetime.now(), repr(e))
+        cursor.execute(query, values)
+        hasErrorLog = True
+    finally:
+        connection.commit()
 
     try:
         # Go to the diectory that contains the scripts
@@ -163,14 +169,12 @@ for message in decoded_response['tx']['body']['messages']:
         # If not, address_id will not
         else:
             table.main(tx_id, i, order, type, message)
-    except KeyError:
-        print(f'KeyError happened in block {file_name}', file=sys.stderr)
-        print(traceback.format_exc(), file=sys.stderr)
-
-    except AttributeError:
-        print(f'Script {table_type} does not have a main function, error caused in block {file_name}', file=sys.stderr)
-    except ImportError as e:
-        print(f'Script {table_type} could not be found, error caused in block {file_name}: {e}', file=sys.stderr)
+    except Exception as e:
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.datetime.now(), repr(e))
+        cursor.execute(query, values)
+        connection.commit()
+        hasErrorLog = True
     i += 1
 
     # Add the message to message_table_lookup
@@ -186,12 +190,17 @@ for message in decoded_response['tx']['body']['messages']:
         message_id = cursor.fetchone()[0]
 
         cursor.execute('INSERT INTO message_table_lookup (tx_id, message_id, message_table_name) VALUES (%s, %s, %s);', (tx_id, message_id, table_type))
-    
+    except Exception as e:
+        connection.rollback()
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.datetime.now(), repr(e))
+        cursor.execute(query, values)
+        hasErrorLog = True  
+    finally:
         connection.commit()
-    except errors.UniqueViolation as e:
-        print(f"Error with loading block info in block {file_name}: {e}", file=sys.stderr)    
 
 cursor.close()
 connection.close()
 
-
+if hasErrorLog:
+    sys.exit(8)

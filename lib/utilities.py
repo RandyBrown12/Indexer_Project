@@ -86,7 +86,7 @@ def check_file(file_path,file_name):
     return content
 
 
-def height_check(content,file_name):
+def height_check(content, file_name):
     try:
 
         # Check if the file name equals the height
@@ -149,7 +149,7 @@ def new_type(message, file_path, height, transaction_num, message_num):
             file.write(message + '\n' + '\n')
 
 
-def decode_tx(tx, max_retries=9, retry_delay=5):
+def decode_tx(tx : base64, max_retries : int = 9, retry_delay : int = 5):
     """
     Decodes a transaction using external APIs.
     Uses round-robin technique to better handle 500 errors.
@@ -200,9 +200,8 @@ def create_connection_with_filepath_json():
             host=info['psql']['db_host'],
             port=info['psql']['db_port'],
         )
-        #print("Connection to PostgreSQL DB successful")#
     except OperationalError as e:
-        print(f"The error '{e}' occurred")
+        print(f"The error '{e}' occurred") 
     except Exception as e:
         print(f"Error while connecting to the database: {e}", file=sys.stderr)
     
@@ -231,6 +230,7 @@ def block_hash_base64_to_hex(hash: str) -> str:
     except Exception as e:
         print(f"Error while hashing: {e}", file=sys.stderr)
         return None
+
 def checkLine(file_path, file_name, N):
        try:
             print("ran", file=sys.stderr)

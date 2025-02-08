@@ -28,9 +28,11 @@ import json
 import sys
 from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex
 from psycopg2 import errors
+import datetime
 
 connection = create_connection_with_filepath_json()
-
+cursor = connection.cursor()
+hasErrorLog = False
 
 file_path = os.getenv('FILE_PATH')
 file_name = os.getenv('FILE_NAME')
@@ -46,26 +48,33 @@ try:
     tx_num = len(content['block']['data']['txs'])
     created_time = content['block']['header']['time']
 except Exception as e:
-    print(f"Error with loading block info in block {file_name} ", file=sys.stderr)
-    sys.exit(6)
+    connection.rollback()
+    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+    values = (datetime.datetime.now(), repr(e))
+    cursor.execute(query, values)
+    hasErrorLog = True
+
 
 # Edit the query that will be loaded to the database
-query = """
-INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s, %s, %s, %s, %s);
-"""
-
-values = (block_hash_hex, chain_id, height, tx_num, created_time)
-
-cursor = connection.cursor()
-
 try:
+    query = """
+            INSERT INTO blocks (block_hash, chain_id, height, tx_num, created_at) VALUES (%s, %s, %s, %s, %s);
+            """
+    values = (block_hash_hex, chain_id, height, tx_num, created_time)
     cursor.execute(query, values)
-except errors.UniqueViolation as e:
-    print(f"Unique value has occured: {e}")
+except Exception as e:
     connection.rollback()
-    cursor.close()
-    sys.exit(6)
+    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+    values = (datetime.datetime.now(), repr(e))
+    cursor.execute(query, values)
+    hasErrorLog = True
+
 
 connection.commit()
-print(f"File: {file_name} has been loaded!")
 cursor.close()
+connection.close()
+
+if hasErrorLog:
+    sys.exit(6)
+else:
+    print(f"File: {file_name} has been loaded!")

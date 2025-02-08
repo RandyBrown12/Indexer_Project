@@ -21,9 +21,11 @@ import json
 from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex, hash_to_hex, decode_tx, time_parse
 from psycopg2 import errors#  compare_nested_json,
 from datetime import timezone
+import datetime
 
 connection = create_connection_with_filepath_json()
-
+cursor = connection.cursor()
+hasErrorLog = False
 #block_path = info["path"]["block_file_path"]
 #for dirName, subDirList, fileList in os.walk(block_path):
     #for file in fileList:
@@ -33,23 +35,34 @@ file_name = os.getenv("FILE_NAME")
 content = check_file(file_path, file_name)
 num = int(os.getenv('x'))
 
-block_hash = content["block_id"]["hash"]
-block_hash_hex = block_hash_base64_to_hex(block_hash)
-chain_id = content["block"]["header"]["chain_id"]
-height = content["block"]["header"]["height"]
-tx_num = str(len(content["block"]["data"]["txs"]))
-created_time = content["block"]["header"]["time"]
+try:
+    block_hash = content["block_id"]["hash"]
+    block_hash_hex = block_hash_base64_to_hex(block_hash)
+    chain_id = content["block"]["header"]["chain_id"]
+    height = content["block"]["header"]["height"]
+    tx_num = str(len(content["block"]["data"]["txs"]))
+    created_time = content["block"]["header"]["time"]
+    transaction_string = content['block']['data']['txs'][num]
+    decoded_response = decode_tx(transaction_string)
+    #print(decoded_response)
+    tx_hash = hash_to_hex(transaction_string)
+    order = num + 1
 
-transaction_string = content['block']['data']['txs'][num]
-decoded_response = decode_tx(transaction_string)
-#print(decoded_response)
-tx_hash = hash_to_hex(transaction_string)
-order = num + 1
-loadedCorrectly = True
-cursor = connection.cursor()
-search_query = f"SELECT block_id FROM blocks WHERE height = '{height}'" # Search the block hash from the block
-cursor.execute(search_query)
-result = cursor.fetchall()
+    search_query = "SELECT block_id FROM blocks WHERE height = %s" # Search the block hash from the block
+    cursor.execute(search_query, (height,))
+    result = cursor.fetchall()
+
+except Exception as e:
+    connection.rollback()
+    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s); "
+    values = (datetime.datetime.now(), e)
+    cursor.execute(query, values)
+    cursor.commit()
+    hasErrorLog = True
+
+
+
+
 ##########block_id =
 
 if(len(decoded_response['tx']['auth_info']['fee']['amount']) != 0):
@@ -60,33 +73,29 @@ else:
         fee_amount = "0"  
         
 
-trans_values = {
-    'block_id': result[0][0],
-    'tx_hash': hash_to_hex(transaction_string),
-    'chain_id':  content["block"]["header"]["chain_id"],
-    'height':  content["block"]["header"]["height"],
-    'memo':  decoded_response['tx']['body']['memo'],
-    'fee_denom':fee_denom,
-    'fee_amount': fee_amount,
-    'gas_limit': decoded_response['tx']['auth_info']['fee']['gas_limit'],
-    'created_at': content['block']['header']['time'],
-    'tx_info': json.dumps(decoded_response),
-    'comment': ''
-}
+
 #print(decoded_response)
 try:
+
+    trans_values = {
+        'block_id': result[0][0],
+        'tx_hash': hash_to_hex(transaction_string),
+        'chain_id':  chain_id,
+        'height':  height,
+        'memo':  decoded_response['tx']['body']['memo'],
+        'fee_denom':fee_denom,
+        'fee_amount': fee_amount,
+        'gas_limit': decoded_response['tx']['auth_info']['fee']['gas_limit'],
+        'created_at': content['block']['header']['time'],
+        'tx_info': json.dumps(decoded_response),
+        'comment': ''
+    }
+    
     query = f"SELECT block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_at, tx_info, comment FROM transactions WHERE height = %s AND tx_hash = %s"
     cursor.execute(query, (height, tx_hash))
     row = cursor.fetchall()
     
-    if row is None:
-
-        print(row, file=sys.stderr)
-        print("There should be only one row in block " + file_name + " at transaction " + num + ", found", len(row), "rows", file=sys.stderr)
-        cursor.close()
-        #break
-        #print("error")
-    else:
+    if row is not None:
         row = row[0]
         colnames =  [desc[0] for desc in cursor.description]
         row_dict = dict(zip(colnames, row))
@@ -105,25 +114,32 @@ try:
                 db_info = row_dict[col].astimezone(timezone.utc).replace(microsecond=0)
                 
             if col == 'tx_info':
-                try:
-                    db_tx_info = json.dumps(row_dict[col])
-                    db_info = json.loads(db_tx_info)
-                    block_info = json.loads(trans_values[col])
-                except json.JSONDecodeError as e:
-                    print("JSONDecodeError:", e)
-                    print(f"Error in block " + file_name)
-                    cursor.close()
-
-
+                db_tx_info = json.dumps(row_dict[col])
+                db_info = json.loads(db_tx_info)
+                block_info = json.loads(trans_values[col])
 
             if block_info != db_info:
-               print(
-                    f"Error in block " + file_name + " at transaction " + num + " in column " + col + " found\n",
-                    "Expected: " + str(block_info) + "\n",
-                    "Found: " + str(db_info) + "\n", file=sys.stderr
+               raise Exception(
+                    f"Error in block {file_name} at transaction {num} in column {col} found\n",
+                    f"Expected: {str(block_info)} \n",
+                    f"Found: {str(db_info)} \n", file=sys.stderr
                 )
-               cursor.close()
-        print(f"Transaction {num + 1} from {file_name} has been verified!")
+        print(f"Transaction {num + 1} from {file_name} has been verified!")         
+    else:
+        raise Exception(
+             f"There should be only one row in block {file_name} at transaction {num}, found {len(row)} rows"
+        )
+        
+except Exception as e:
+    connection.rollback()
+    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s); "
+    values = (datetime.datetime.now(), repr(e))
+    cursor.execute(query, values)
+    hasErrorLog = True
 
-except errors.UniqueViolation as e:
-    pass
+connection.commit()
+cursor.close()
+connection.close()
+
+if hasErrorLog:
+     sys.exit(9)
