@@ -76,5 +76,3 @@ connection.close()
 
 if hasErrorLog:
     sys.exit(6)
-else:
-    print(f"File: {file_name} has been loaded!")

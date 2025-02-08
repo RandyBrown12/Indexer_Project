@@ -62,10 +62,8 @@ try:
     transaction_string = content['block']['data']['txs'][num]
     decoded_response = decode_tx(transaction_string)
     if(decoded_response is None):
-        print(f"failed to decode transaction in block {file_name}", file=sys.stderr)
         exit()
-    else:
-        print(f"Transaction {num + 1} from {file_name} has been successfully decoded!")
+
     tx_hash = hash_to_hex(transaction_string)
     chain_id = content['block']['header']['chain_id']
     height = content['block']['header']['height']
@@ -127,7 +125,6 @@ for message in decoded_response['tx']['body']['messages']:
     try:
         type = message['@type']
         table_type = type_json[type]
-        print(f"Transaction Table: {table_type}")
     except KeyError as e:
         query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
         values = (datetime.datetime.now(), e)
@@ -146,6 +143,8 @@ for message in decoded_response['tx']['body']['messages']:
     # Load the type and height to type table
     try:
         cursor.execute('INSERT INTO type (type, height) VALUES (%s, %s);', (type, height))
+    except errors.UniqueViolation:
+        pass
     except Exception as e:
         connection.rollback()
         query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
@@ -180,7 +179,6 @@ for message in decoded_response['tx']['body']['messages']:
     # Add the message to message_table_lookup
     try:
         if table_type not in type_json.values():
-            print(f"Error with loading block info in block {file_name}: {table_type} is not in type.json", file=sys.stderr)
             continue
 
         query = f"SELECT message_id FROM {table_type} WHERE tx_id = %s;"

@@ -35,12 +35,10 @@ try:
 
     cursor.execute(query, values)
     result = cursor.fetchall()
-    print(f"Block: {file_name} has been verified!")
     
     # check there should only be one row
     if result is None or len(result) != 1:
-        # print to stderr
-        print("There should be only one row", file=sys.stderr)
+        raise Exception(f"Invalid number of rows found, expected 1, found {len(result)}")
 
     result = result[0]
 

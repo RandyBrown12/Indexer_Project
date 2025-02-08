@@ -13,10 +13,12 @@ Published Date: 4/15/2024                                                       
                                                                                     *
 Version: 1.0                                                                        *
                                                                                     *
-Version: 1.1
-Now 'address_load' only needs one input. Also, the info of 'address_type' has
+Version: 1.1                                                                        *                                   
+Now 'address_load' only needs one input. Also, the info of 'address_type' has       *
 changed to only three condition, 'user', 'validator', and 'contract'.               *
                                                                                     *
+Version: 1.2                                                                        *
+Handle address_id that has a unique key. Otherwise, log it into error_log           *
 **********************************************************************************'''
 
 #    Scripts start below
@@ -35,7 +37,6 @@ def main(address):
         connection = create_connection_with_filepath_json()
         cursor = connection.cursor()
 
-        file_name = os.getenv('FILE_NAME')
         # Define the values
         comment = ''
         created_time = datetime.now()
@@ -62,7 +63,7 @@ def main(address):
         # If the address does not belong to three types above, it will be an unknown type
         else:
             address_type = 'Unknown'
-            print(f"The type of address could not be detected, check address" + address + " in block " + file_name, file=sys.stderr)
+
 
         query = """
         INSERT INTO address (address_type, addresses, comment, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)
@@ -75,7 +76,11 @@ def main(address):
     
         cursor.execute(query, values)
         address_id = cursor.fetchone()[0]
-
+    except errors.UniqueViolation:
+        connection.rollback()
+        query = f"SELECT address_id FROM address WHERE addresses = '{address}'"
+        cursor.execute(query) 
+        address_id = cursor.fetchone()[0]
     except Exception as e:
         connection.rollback()
         query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s); "

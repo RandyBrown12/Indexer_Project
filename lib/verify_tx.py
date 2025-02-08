@@ -123,8 +123,7 @@ try:
                     f"Error in block {file_name} at transaction {num} in column {col} found\n",
                     f"Expected: {str(block_info)} \n",
                     f"Found: {str(db_info)} \n", file=sys.stderr
-                )
-        print(f"Transaction {num + 1} from {file_name} has been verified!")         
+                )   
     else:
         raise Exception(
              f"There should be only one row in block {file_name} at transaction {num}, found {len(row)} rows"
