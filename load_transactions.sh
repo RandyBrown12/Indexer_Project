@@ -326,8 +326,4 @@ for file_name in $files; do
         echo "There are no transactions in $FILE_NAME."
     fi
 done
-
-echo ""
-echo "$block_count blocks were processed."
-echo "$txn_count transactions were processed."
 exit 0
