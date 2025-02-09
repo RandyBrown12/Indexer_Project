@@ -70,13 +70,15 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
         values = (tx_id, tx_type, sequence, source_port, source_channel, destination_port, destination_channel, data, timeout_height_revision_num, timeout_height_revision_height, timeout_timestamp, proof_unreceived, proof_height_revision_number, proof_height_revision_height, next_sequence_recv, ids['signer_id'], message, comment)
         cursor.execute(query, values)
+        connection.commit()
+    except errors.UniqueViolation as e:
+        connection.rollback()
     except Exception as e:
         connection.rollback()
         query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
         values = (datetime.datetime.now(), repr(e))
         cursor.execute(query, values)
     finally:
-        connection.commit()
         cursor.close()
         connection.close()
 

@@ -53,13 +53,15 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
         values = (tx_id, tx_type, ids['delegator_address_id'], ids['validator_address_id'], tx_denom, amount, message, comment)
         cursor.execute(query, values)
+        connection.commit()
+    except errors.UniqueViolation as e:
+        connection.rollback()    
     except Exception as e:
         connection.rollback()
         query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
         values = (datetime.datetime.now(), repr(e))
         cursor.execute(query, values)
     finally:
-        connection.commit()
         cursor.close()
         connection.close()
 
