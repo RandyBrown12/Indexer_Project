@@ -48,23 +48,31 @@ import traceback
 #from terra_sdk.core.tx import Tx #?/ trmintimport
 
 def check_file(file_path,file_name):
+        
+    connection = create_connection_with_filepath_json()
+    cursor = connection.cursor()
+
 
     # Check if the file exists in the directory
-    if os.path.isfile(file_path):
-        pass
-        # print(f'{file_name} does exist in {path_name}')
-    else:
-        print(f'{file_name} does exist in {file_path}, or {file_name} is not a file', file=sys.stderr)
+    if not os.path.isfile(file_path):
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), f"{file_name} does exist in {file_path}, or {file_name} is not a file")
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
         sys.exit(1)
 
 
 
-        # Check if the file name is composed entirely of digits
-    if file_name.isdigit():
-        pass
-            #print('This file is named by numbers')
-    else:
-        print(f"The file name {file_name} is not composed entirely of digits.", file=sys.stderr)
+    # Check if the file name is composed entirely of digits
+    if not file_name.isdigit():
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), f"The file name {file_name} is not composed entirely of digits.")
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
         sys.exit(2)
 
 
@@ -76,36 +84,65 @@ def check_file(file_path,file_name):
             content = json.load(file)
 
     except json.JSONDecodeError:
-        print(f"{file_name} is not a JSON file.", file=sys.stderr)
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), f"{file_name} is not a JSON file.")
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
         sys.exit(3)
 
     except ValueError as e:
-        print(f"Error reading file {file_path}: {e}", file=sys.stderr)
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), f"Error reading file {file_path}: {e}")
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
         sys.exit(4)
 
+    cursor.close()
+    connection.close()
     return content
 
 
 def height_check(content, file_name):
+    connection = create_connection_with_filepath_json()
+    cursor = connection.cursor()
+
     try:
 
         # Check if the file name equals the height
         height = content['block']['header']['height']
     except KeyError:
-        print("There is not such key in the file", file=sys.stderr)
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), "There is not such key in the file")
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
         sys.exit(5)
     except TypeError:
-        print("The Type of value is not correct", file=sys.stderr)
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), "The Type of value is not correct")
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
         sys.exit(6)
 
-    if height == file_name:
-        # print(f'{file_name} is same as height.')
-        pass
-    else:
-        print(f'Error: {file_name} does not same as height.', file=sys.stderr)
+    if height != file_name:
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), f'Error: {file_name} does not have the same name as height.')
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
         sys.exit(7)
 
-    # print(f'{file_name} is a valid JSON file and the name is same as the BLOCK HEIGHT'
+    cursor.close()
+    connection.close()
+
     return height
 
 
@@ -166,6 +203,9 @@ def decode_tx(tx : base64, max_retries : int = 9, retry_delay : int = 5):
     headers = {'Content-Type': 'application/json'}
     data = json.dumps({"tx_bytes": tx})
 
+    connection = create_connection_with_filepath_json()
+    cursor = connection.cursor()
+
     current_retries = 0
     while current_retries < max_retries:
         try:
@@ -173,17 +213,25 @@ def decode_tx(tx : base64, max_retries : int = 9, retry_delay : int = 5):
             response = requests.post(full_url, headers=headers, data=data, timeout=5)  # Adding a 5-second timeout
             if response.status_code == 200:
                 return response.json()
-            else:
-                print(f"Error: Unable to decode transaction, server returned status code {response.status_code} using {full_url}", file=sys.stderr)
-                if response.status_code in [500, 502, 503, 504]:  # Retry on certain status codes
-                    time.sleep(retry_delay)
-                    current_retries += 1
-                else:
-                    break  # Do not retry on other errors
+            
+            # Throws 4xx and 5xx errors.
+            response.raise_for_status()
+
         except requests.exceptions.RequestException as e:
-            print(f"Network request error: {e} using {full_url}", file=sys.stderr)
+            
+            query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+            values = (datetime.now(), f"Error: Unable to decode transaction, server returned status code {response.status_code} using {full_url}")
+            cursor.execute(query, values)
+        
+            if response.status_code not in [500, 502, 503, 504]:
+                break
+
             time.sleep(retry_delay)
             current_retries += 1
+    
+    connection.commit()
+    cursor.close()
+    connection.close()
     return None
 
 def create_connection_with_filepath_json():
@@ -216,8 +264,14 @@ def hash_to_hex(data: str) -> str:
         # Convert hash to uppercase
         return sha256_hash.upper()
     except Exception as e:
-        print(f"Error while hashing: {e}", file=sys.stderr)
-        return None
+        connection = create_connection_with_filepath_json()
+        cursor = connection.cursor()
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), repr(e))
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
 
 def block_hash_base64_to_hex(hash: str) -> str:
     try:
@@ -228,41 +282,51 @@ def block_hash_base64_to_hex(hash: str) -> str:
         # Convert hash to uppercase
         return hex_str.upper()
     except Exception as e:
-        print(f"Error while hashing: {e}", file=sys.stderr)
-        return None
+        connection = create_connection_with_filepath_json()
+        cursor = connection.cursor()
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
+        values = (datetime.now(), repr(e))
+        cursor.execute(query, values)
+        connection.commit()
+        cursor.close()
+        connection.close()
 
 def checkLine(file_path, file_name, N):
-       try:
-            print("ran", file=sys.stderr)
-            with open(file_path, 'r') as fr:
-                # reading line by line
-                lines = fr.readlines()
-                if(N >= len(lines) or N == 0):
-                    print(f"Error: Line number does not exist", file=sys.stderr)
+       
+    connection = create_connection_with_filepath_json()
+    cursor = connection.cursor()
+
+    try:
+        print("ran", file=sys.stderr)
+        with open(file_path, 'r') as fr:
+            # reading line by line
+            lines = fr.readlines()
+            if(N >= len(lines) or N == 0):
+                print(f"Error: Line number does not exist", file=sys.stderr)
+            else:
+                if lines[N - 1].strip() != '':
+                    foundError = N
                 else:
-                    if lines[N - 1].strip() != '':
-                        foundError = N
-                    else:
-                        foundError = -1
-                    # pointer for position
-                    ptr = 1
-                
-                    # opening in writing mode
-                    if foundError != -1:
-                        with open(file_path, 'w') as fw:
-                            for line in lines:
-                            
-                                # we want to remove 5th line
-                                if ptr != foundError:
-                                    fw.write(line)
-                                ptr += 1
-                        print(foundError, sys.stderr)
-            print("Deleted", file=sys.stderr)
+                    foundError = -1
+                # pointer for position
+                ptr = 1
             
-            check_file(file_path, file_name)
-       except:
-            print("Oops! something error", sys.stderr)
-            print(traceback.format_exc())
+                # opening in writing mode
+                if foundError != -1:
+                    with open(file_path, 'w') as fw:
+                        for line in lines:
+                        
+                            # we want to remove 5th line
+                            if ptr != foundError:
+                                fw.write(line)
+                            ptr += 1
+                    print(foundError, sys.stderr)
+        print("Deleted", file=sys.stderr)
+            
+        check_file(file_path, file_name)
+    except:
+        print("Oops! something error", sys.stderr)
+        print(traceback.format_exc())
 
 
 def time_parse(time_string):

@@ -37,7 +37,7 @@ try:
     if validate_json(result, file_name) == 0:
         foundError = checkLine(file_name, 1)
         if(foundError >= 0):
-            raise(f"Error in JSON File {file_name} on line {foundError}")
+            raise Exception(f"Error in JSON File {file_name} on line {foundError}")
         
 except Exception as e:
     connection = create_connection_with_filepath_json()
