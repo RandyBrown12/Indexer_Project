@@ -172,7 +172,7 @@ for file_name in $files; do
     if [[ $python_three == true ]]; then
 
         python3 "$(pwd)/lib/check_one_file.py"
-        $PROGRAM_EXIT_CODE=$?
+        PROGRAM_EXIT_CODE=$?
         # An error code 0 means the block does not pass the validation
         if [[ $((PROGRAM_EXIT_CODE)) -ne 0 ]]; then
             echo "$FILE_NAME does not pass the JSON validation. (Exit code $PROGRAM_EXIT_CODE). Check log table for more information"
