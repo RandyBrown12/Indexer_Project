@@ -266,8 +266,6 @@ for file_name in $files; do
         if [[ $verbose == true ]]; then
             echo "$length transactions in $FILE_NAME loaded into the database."
         fi
-    else
-        echo "There are no transactions in $FILE_NAME."
     fi
 done
 exit 0
