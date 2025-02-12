@@ -26,7 +26,7 @@ New package: psycopg2 now applies on this script                                
 import os
 import json
 import sys
-from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex
+from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex, log_error_to_database
 from psycopg2 import errors
 import datetime
 
@@ -49,9 +49,7 @@ try:
     created_time = content['block']['header']['time']
 except Exception as e:
     connection.rollback()
-    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-    values = (datetime.datetime.now(), repr(e))
-    cursor.execute(query, values)
+    log_error_to_database(repr(e))
     hasErrorLog = True
 
 
@@ -64,9 +62,7 @@ try:
     cursor.execute(query, values)
 except Exception as e:
     connection.rollback()
-    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-    values = (datetime.datetime.now(), repr(e))
-    cursor.execute(query, values)
+    log_error_to_database(repr(e))
     hasErrorLog = True
 
 

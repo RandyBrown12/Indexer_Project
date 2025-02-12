@@ -1284,5 +1284,6 @@ create table if not exists cosmos_setwithdrawaddress_msg (
 create table if not exists error_logs (
     error_log_id uuid default gen_random_uuid() not null primary key,
     error_log_timestamp timestamp with time zone not null,
-    error_log_message VARCHAR
+    error_log_block_number NUMERIC not null,
+    error_log_message VARCHAR not null
 );

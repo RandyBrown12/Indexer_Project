@@ -1,5 +1,5 @@
 import unittest
-from lib.utilities import decode_tx
+from lib.utilities import decode_tx, log_error_to_database
 import json
 #file_path = os.getenv("FILE_PATH")
 #file_name = os.getenv("FILE_NAME")
@@ -16,5 +16,8 @@ class Validate_Decode_Tx_Function(unittest.TestCase):
     def test_invalid_base64(self):
         self.assertEqual(decode_tx("abc"), None)
 
+    def test_logging(self):
+        log_error_to_database("Test Message")
+        
 if __name__ == "__main__":
     unittest.main()

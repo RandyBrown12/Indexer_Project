@@ -22,7 +22,7 @@ Handle address_id that has a unique key. Otherwise, log it into error_log       
 **********************************************************************************'''
 
 #    Scripts start below
-from utilities import create_connection_with_filepath_json
+from utilities import create_connection_with_filepath_json, log_error_to_database, log_error_to_database
 from datetime import datetime
 import json
 import os
@@ -83,9 +83,7 @@ def main(address):
         address_id = cursor.fetchone()[0]
     except Exception as e:
         connection.rollback()
-        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s); "
-        values = (datetime.now(), repr(e))
-        cursor.execute(query, values)
+        log_error_to_database(repr(e))
 
     connection.commit()
     cursor.close()

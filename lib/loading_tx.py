@@ -39,7 +39,7 @@ from psycopg2 import errors
 import traceback
 
 # Local Scripts
-from utilities import check_file, create_connection_with_filepath_json, decode_tx, hash_to_hex
+from utilities import check_file, create_connection_with_filepath_json, decode_tx, hash_to_hex, log_error_to_database
 import address_load as address_load
 import datetime
 
@@ -85,10 +85,8 @@ try:
     comment = ''
     tx_info = json.dumps(decoded_response)
 except Exception as e:
-    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-    values = (datetime.datetime.now(), repr(e))
-    cursor.execute(query, values)
-    connection.commit()
+    connection.rollback()
+    log_error_to_database(repr(e))
     hasErrorLog = True
 
 # Edit the query that will be loaded to the database
@@ -99,14 +97,11 @@ try:
     values = (block_id, tx_hash, chain_id, height, memo, fee_denom, fee_amount, gas_limit, created_time, tx_info, comment)
     cursor.execute(query, values)
     tx_id = cursor.fetchone()[0]
+    connection.commit()
 except Exception as e:
     connection.rollback()
-    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-    values = (datetime.datetime.now(), repr(e))
-    cursor.execute(query, values)
+    log_error_to_database(repr(e))
     hasErrorLog = True
-finally:
-    connection.commit()
 
 
 
@@ -126,10 +121,7 @@ for message in decoded_response['tx']['body']['messages']:
         type = message['@type']
         table_type = type_json[type]
     except KeyError as e:
-        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-        values = (datetime.datetime.now(), e)
-        cursor.execute(query, values)
-        connection.commit()
+        log_error_to_database(repr(e))
         hasErrorLog = True
     ids = {}
     for key in message:
@@ -143,16 +135,13 @@ for message in decoded_response['tx']['body']['messages']:
     # Load the type and height to type table
     try:
         cursor.execute('INSERT INTO type (type, height) VALUES (%s, %s);', (type, height))
+        connection.commit()
     except errors.UniqueViolation:
         pass
     except Exception as e:
         connection.rollback()
-        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-        values = (datetime.datetime.now(), repr(e))
-        cursor.execute(query, values)
+        log_error_to_database(repr(e))
         hasErrorLog = True
-    finally:
-        connection.commit()
 
     try:
         # Go to the diectory that contains the scripts
@@ -168,18 +157,15 @@ for message in decoded_response['tx']['body']['messages']:
         # If not, address_id will not
         else:
             table.main(tx_id, i, order, type, message)
-    except Exception as e:
-        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-        values = (datetime.datetime.now(), repr(e))
-        cursor.execute(query, values)
         connection.commit()
+    except Exception as e:
+        connection.rollback()
+        log_error_to_database(repr(e))
         hasErrorLog = True
     i += 1
 
     # Add the message to message_table_lookup
     try:
-        if table_type not in type_json.values():
-            continue
 
         query = f"SELECT message_id FROM {table_type} WHERE tx_id = %s;"
 
@@ -188,14 +174,11 @@ for message in decoded_response['tx']['body']['messages']:
         message_id = cursor.fetchone()[0]
 
         cursor.execute('INSERT INTO message_table_lookup (tx_id, message_id, message_table_name) VALUES (%s, %s, %s);', (tx_id, message_id, table_type))
+        connection.commit()
     except Exception as e:
         connection.rollback()
-        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-        values = (datetime.datetime.now(), repr(e))
-        cursor.execute(query, values)
+        log_error_to_database(repr(e))
         hasErrorLog = True  
-    finally:
-        connection.commit()
 
 cursor.close()
 connection.close()

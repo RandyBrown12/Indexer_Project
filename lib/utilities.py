@@ -255,6 +255,29 @@ def create_connection_with_filepath_json():
     
     return connection
 
+def log_error_to_database(message: str) -> None:
+    """
+    Log the message to the error_log table.
+    
+    Args:
+        Error Message to put into the database.
+    """
+
+    try:
+        file_name = int(os.getenv('FILE_NAME'))
+        connection = create_connection_with_filepath_json()
+        cursor = connection.cursor()
+        query = "INSERT INTO error_logs (error_log_timestamp, error_log_block_number, error_log_message) VALUES (%s, %s, %s);"
+        values = (datetime.now(), file_name, message)
+        cursor.execute(query, values)
+        connection.commit()
+    except Exception as e:
+        print(f"There is an error logging into the database: {e}", file=sys.stderr)
+        connection.rollback()
+    finally:
+        cursor.close()
+        connection.close()
+
 def hash_to_hex(data: str) -> str:
     try:
         # Convert data from base64 to bytes

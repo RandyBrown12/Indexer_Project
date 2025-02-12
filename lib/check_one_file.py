@@ -23,7 +23,7 @@ Version: 1.0                                                                    
 ####    Scripts start below
 import os
 import sys
-from utilities import check_file, height_check, validate_json, checkLine, create_connection_with_filepath_json
+from utilities import check_file, height_check, validate_json, checkLine, create_connection_with_filepath_json, log_error_to_database
 import datetime
 
 file_path = os.getenv('FILE_PATH')
@@ -40,12 +40,5 @@ try:
             raise Exception(f"Error in JSON File {file_name} on line {foundError}")
         
 except Exception as e:
-    connection = create_connection_with_filepath_json()
-    cursor = connection.cursor()
-    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s); "
-    values = (datetime.datetime.now(), repr(e))
-    cursor.execute(query, values)
-    connection.commit()
-    cursor.close()
-    connection.close()
+    log_error_to_database(repr(e))
     sys.exit(5)

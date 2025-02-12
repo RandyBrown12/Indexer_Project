@@ -16,7 +16,7 @@ Updated query to fit Version 1.8 cosmos_setwithdrawaddress_msg table.           
 **********************************************************************************'''
 
 # Libraries below
-from utilities import create_connection_with_filepath_json
+from utilities import create_connection_with_filepath_json, log_error_to_database
 import json
 import sys
 import os
@@ -46,9 +46,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
         connection.rollback()    
     except Exception as e:
         connection.rollback()
-        query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-        values = (datetime.datetime.now(), repr(e))
-        cursor.execute(query, values)
+        log_error_to_database(repr(e))
     finally:
         cursor.close()
         connection.close()

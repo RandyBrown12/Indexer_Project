@@ -18,7 +18,7 @@ Version: 1.0                                                                    
 import os
 import sys
 import json
-from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex, hash_to_hex, decode_tx, time_parse
+from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex, hash_to_hex, decode_tx, time_parse, log_error_to_database
 from psycopg2 import errors#  compare_nested_json,
 from datetime import timezone
 import datetime
@@ -54,10 +54,7 @@ try:
 
 except Exception as e:
     connection.rollback()
-    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s); "
-    values = (datetime.datetime.now(), e)
-    cursor.execute(query, values)
-    cursor.commit()
+    log_error_to_database(repr(e))
     hasErrorLog = True
 
 
@@ -127,16 +124,13 @@ try:
     else:
         raise Exception(
              f"There should be only one row in block {file_name} at transaction {num}, found {len(row)} rows"
-        )
-        
+        )        
+    connection.commit()
 except Exception as e:
     connection.rollback()
-    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s); "
-    values = (datetime.datetime.now(), repr(e))
-    cursor.execute(query, values)
+    log_error_to_database(repr(e))
     hasErrorLog = True
 
-connection.commit()
 cursor.close()
 connection.close()
 

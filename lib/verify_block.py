@@ -2,7 +2,7 @@
 import os
 import sys
 import json
-from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex, time_parse
+from utilities import check_file, create_connection_with_filepath_json, block_hash_base64_to_hex, time_parse, log_error_to_database
 from psycopg2 import errors
 from datetime import timezone
 import datetime
@@ -56,15 +56,13 @@ try:
 
     if created_time != database_time:
         raise Exception(f"Created time is not correct, found {database_time} expected {created_time} ")
-
+    
+    connection.commit()
 except Exception as e:
     connection.rollback()
-    query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-    values = (datetime.datetime.now(), repr(e))
-    cursor.execute(query, values)
-    hasErrorLog = True  
+    log_error_to_database(repr(e))
+    hasErrorLog = True
 
-connection.commit()
 cursor.close()
 connection.close()
 
