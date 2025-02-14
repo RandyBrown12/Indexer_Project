@@ -1080,15 +1080,14 @@ create table if not exists cosmwasm_migratecontract_msg
     message_id         uuid default gen_random_uuid() not null
         primary key,
     tx_id                           uuid             not null,
-    send_address_id          uuid             not null,
-    tx_type             VARCHAR          not null,
-    contracts           VARCHAR          not null,
-    code_id             VARCHAR          not null,
-    msg                 VARCHAR          not null,
+    sender_address_id               VARCHAR          not null,
+    tx_type                         VARCHAR          not null,
+    contract                        VARCHAR          not null,
+    code_id                         VARCHAR          not null,
+    msg                             jsonb            not null,
     message_info                    jsonb            not null,
     comment                         VARCHAR          not null,
     FOREIGN KEY (tx_id) REFERENCES transactions(tx_id),
-    FOREIGN KEY (send_address_id) REFERENCES address(address_id),
     UNIQUE(tx_id, comment)
 
 );
@@ -1100,7 +1099,7 @@ create index if not exists cosmwasm_migratecontract_tx_id
     on cosmwasm_executecontract_msg (tx_id);
 
 create index if not exists cosmwasm_migratecontract_contracts
-    on cosmwasm_migratecontract_msg(contracts);
+    on cosmwasm_migratecontract_msg(contract);
 
 
 create table if not exists ibc_openconnectiontry_msg
