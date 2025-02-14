@@ -208,6 +208,7 @@ def decode_tx(tx : base64, max_retries : int = 9, retry_delay : int = 5):
 
     current_retries = 0
     while current_retries < max_retries:
+        response = None
         try:
             full_url = f"{url_array[current_retries % len(url_array)]}cosmos/tx/v1beta1/decode"
             response = requests.post(full_url, headers=headers, data=data, timeout=5)  # Adding a 5-second timeout

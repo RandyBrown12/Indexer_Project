@@ -43,6 +43,8 @@ try:
     tx_num = str(len(content["block"]["data"]["txs"]))
     created_time = content["block"]["header"]["time"]
     transaction_string = content['block']['data']['txs'][num]
+    if decode_tx(transaction_string) is None:
+        raise ValueError(f"Transatcion String: {transaction_string} when decoded returns None", file=sys.stderr)
     decoded_response = decode_tx(transaction_string)
     #print(decoded_response)
     tx_hash = hash_to_hex(transaction_string)
