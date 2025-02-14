@@ -9,10 +9,10 @@ Libraries: json                                                                 
                                                                                     *
 Creater Name: Ziqi Yang                                                             *
                                                                                     *
-Published Date: 11/06/2024                                                           *
+Published Date: 11/06/2024                                                          *
                                                                                     *
 Version: 1.0                                                                        *
-                                                                                    *
+Fix typo: proposers_id is now proposer_id                                           *
                                                                                     *
                                                                                     *
 **********************************************************************************'''
