@@ -32,8 +32,8 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
     cursor = connection.cursor()
     file_name = os.getenv('FILE_NAME')
     try:
+
         # Define the values
-        
         content = message['content']
         title = content['title']
         descriptions = content['description']
@@ -42,7 +42,7 @@ def main(tx_id, message_no, transaction_no, tx_type, message, ids):
 
         #  Edit the query that will be loaded to the database
         query = """
-        INSERT INTO cosmos_submitproposal_msg (tx_id, tx_type, title, descriptions, proposers_id, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s);
+        INSERT INTO cosmos_submitproposal_msg (tx_id, tx_type, title, descriptions, proposer_id, message_info, comment) VALUES (%s, %s, %s, %s, %s, %s, %s);
         """
 
         values = (tx_id, tx_type, title, descriptions, ids['proposer_id'], message, comment)
