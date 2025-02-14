@@ -17,7 +17,8 @@ class Validate_Decode_Tx_Function(unittest.TestCase):
         self.assertEqual(decode_tx("abc"), None)
 
     def test_logging(self):
-        log_error_to_database("Test Message")
+        tx_string = "CrgBCqMBCiQvY29zbXdhc20ud2FzbS52MS5Nc2dNaWdyYXRlQ29udHJhY3QSewoubWlnYWxvbzE4cTZleXo1c3VyODU5cHl1NjU2ZnUyazJsaG1sN3U2YXljeG1tNhJCbWlnYWxvbzFyOHEwMmF3ZGM0ajRwOTdoM21nc3I3ODQ0cDRkMjB6eW1mcXA0cmc2cHJnbGo4N3I5N3Zxd3ptbWQzGJcGIgJ7fRIQTWlncmF0ZSBDb250cmFjdBJqClAKRgofL2Nvc21vcy5jcnlwdG8uc2VjcDI1NmsxLlB1YktleRIjCiECuHbppNsIwXwBnPtUotd3ldo6/rqQEWSVXIhzMvU5bIYSBAoCCAEYOhIWChAKBnV3aGFsZRIGMTYzMzk0EML8CRpATyhvZqCKnzFd26FMIuB1XN53iarvCUdb/eFfJk97HxBX00cvqo0wgqGwF8t0D3W4xz89iOHL1sT87Yfvg0CfzQ=="
+        print(decode_tx(tx_string))
         
 if __name__ == "__main__":
     unittest.main()
