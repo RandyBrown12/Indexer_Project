@@ -7,7 +7,7 @@ Programming Language: Python 3.11                                               
                                                                                     *
 Libraries: json                                                                     *
                                                                                     *
-Creater Name: Randy Brown                                                           *
+Creator Name: Randy Brown                                                           *
                                                                                     *
 Published Date: 11/06/2024                                                          *
                                                                                     *
