@@ -224,7 +224,7 @@ def decode_tx(tx : base64, max_retries : int = 9, retry_delay : int = 5):
             values = (datetime.now(), file_name, repr(e))
             cursor.execute(query, values)
         
-            if response.status_code not in [500, 502, 503, 504]:
+            if 400 <= response.status_code <= 499:
                 break
 
             time.sleep(retry_delay)
