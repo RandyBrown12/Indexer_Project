@@ -218,16 +218,17 @@ def decode_tx(tx : base64, max_retries : int = 9, retry_delay : int = 5):
             # Throws 4xx and 5xx errors.
             response.raise_for_status()
 
-        except requests.exceptions.RequestException as e:
-            
-            query = "INSERT INTO error_logs (error_log_timestamp, error_log_message) VALUES (%s, %s);"
-            values = (datetime.now(), f"Error: Unable to decode transaction, server returned status code {response.status_code} using {full_url}")
+        except requests.exceptions.HTTPError as e:
+            query = "INSERT INTO error_logs (error_log_timestamp, error_log_block_number, error_log_message) VALUES (%s, %s, %s);"
+            file_name = os.getenv("FILE_NAME")
+            values = (datetime.now(), file_name, repr(e))
             cursor.execute(query, values)
         
             if response.status_code not in [500, 502, 503, 504]:
                 break
 
             time.sleep(retry_delay)
+        finally:
             current_retries += 1
     
     connection.commit()
