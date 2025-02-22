@@ -39,7 +39,7 @@ class Validate_Decode_Tx_Function(unittest.TestCase):
         decode_tx(self.valid_tx_string)
         self.assertEqual(mock_get.call_count, 1)
 
-    # Go to different endpoints 9 times on 400 errors.
+    # Go to different endpoints 9 times on 500 errors.
     @patch.dict(os.environ, {"FILE_NAME": "9999999" })
     @patch('requests.post')
     def test_500_response(self, mock_get):
