@@ -38,24 +38,24 @@ try:
     
     # check there should only be one row
     if result is None or len(result) != 1:
-        raise Exception(f"Invalid number of rows found, expected 1, found {len(result)}")
+        raise ValueError(f"Invalid number of rows found, expected 1, found {len(result)}")
 
     result = result[0]
 
     # check the block information is correct
     if result[1] != chain_id:
-        raise Exception(f"Chain id is not correct, found {result[1]} expected {chain_id}")
+        raise ValueError(f"Chain id is not correct, found {result[1]} expected {chain_id}")
     if result[2] != height:
-        raise Exception(f"Height is not correct, found {result[2]} expected {height}")
+        raise ValueError(f"Height is not correct, found {result[2]} expected {height}")
     if result[3] != tx_num:
-        raise Exception(f"Tx number is not correct, found {result[3]} expected {tx_num}")
+        raise ValueError(f"Tx number is not correct, found {result[3]} expected {tx_num}")
 
 
     created_time = time_parse(created_time)
     database_time = result[4].astimezone(timezone.utc).replace(microsecond=0)
 
     if created_time != database_time:
-        raise Exception(f"Created time is not correct, found {database_time} expected {created_time} ")
+        raise ValueError(f"Created time is not correct, found {database_time} expected {created_time} ")
     
     connection.commit()
 except Exception as e:

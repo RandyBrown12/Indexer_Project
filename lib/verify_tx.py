@@ -118,13 +118,9 @@ try:
                 block_info = json.loads(trans_values[col])
 
             if block_info != db_info:
-               raise Exception(
-                    f"Error in block {file_name} at transaction {num} in column {col} found\n",
-                    f"Expected: {str(block_info)} \n",
-                    f"Found: {str(db_info)} \n", file=sys.stderr
-                )   
+               raise ValueError(f"""Error in block {file_name} at transaction {num} in column {col} (Expected: {str(block_info)} -> Found: {str(db_info)}) """)
     else:
-        raise Exception(
+        raise ValueError(
              f"There should be only one row in block {file_name} at transaction {num}, found {len(row)} rows"
         )        
     connection.commit()

@@ -37,7 +37,7 @@ try:
     if validate_json(result, file_name) == 0:
         foundError = checkLine(file_name, 1)
         if(foundError >= 0):
-            raise Exception(f"Error in JSON File {file_name} on line {foundError}")
+            raise ValueError(f"Error in JSON File {file_name} on line {foundError}")
         
 except Exception as e:
     log_error_to_database(repr(e))
