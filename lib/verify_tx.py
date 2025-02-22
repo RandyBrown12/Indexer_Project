@@ -63,14 +63,12 @@ except Exception as e:
 
 
 ##########block_id =
-
 if(len(decoded_response['tx']['auth_info']['fee']['amount']) != 0):
         fee_denom = decoded_response['tx']['auth_info']['fee']['amount'][0]['denom']
         fee_amount = decoded_response['tx']['auth_info']['fee']['amount'][0]['amount']
 else:
-        fee_denom = "0"
-        fee_amount = "0"  
-        
+        fee_denom = "No Unit Listed"
+        fee_amount = "0"
 
 
 #print(decoded_response)
@@ -82,7 +80,7 @@ try:
         'chain_id':  chain_id,
         'height':  height,
         'memo':  decoded_response['tx']['body']['memo'],
-        'fee_denom':fee_denom,
+        'fee_denom': fee_denom,
         'fee_amount': fee_amount,
         'gas_limit': decoded_response['tx']['auth_info']['fee']['gas_limit'],
         'created_at': content['block']['header']['time'],

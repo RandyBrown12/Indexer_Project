@@ -77,8 +77,8 @@ try:
         fee_denom = decoded_response['tx']['auth_info']['fee']['amount'][0]['denom']
         fee_amount = decoded_response['tx']['auth_info']['fee']['amount'][0]['amount']
     else:
-        fee_denom = ""
-        fee_amount = 0
+        fee_denom = "No Unit Listed"
+        fee_amount = "0"
     gas_limit = decoded_response['tx']['auth_info']['fee']['gas_limit']
     created_time = content['block']['header']['time']
     order = num + 1
