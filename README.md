@@ -1,4 +1,4 @@
-# Indexer Project FROM EMRTS
+# Indexer Project from EMRTS
 
 ## Intro
 Indexer Project achieves Extract, Translate, Loading (ETL) progress by using Python and Shell script, allowing users to load different information from files to database. The blocks in blockchains are the primary information to be loaded. 
